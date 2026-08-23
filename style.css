@@ -411,3 +411,82 @@ section {
     transform: none !important;
   }
 }
+
+/* WebGL Active Overrides */
+body.webgl-active {
+    background: transparent !important;
+}
+body.webgl-active .hero {
+    background: transparent !important;
+}
+body.webgl-active .project-surface {
+    /* Make DOM project cards slightly translucent to see the 3D world */
+    background-color: rgba(34, 34, 34, 0.8) !important;
+}
+body.webgl-active::before {
+    display: none !important; /* Hide original pseudo-lighting */
+}
+
+/* WebGL Active Phase 6.2 Overrides */
+body.webgl-active {
+    overflow: hidden !important;
+    touch-action: none !important; /* Prevent all native gestures */
+    background: #050505 !important;
+}
+
+body.webgl-active main {
+    /* Hide the 2D scrolling content visually, it fights the 3D space */
+    /* We keep the header/footer if needed, but let's hide main sections */
+    visibility: hidden;
+}
+
+body.webgl-active #contact {
+    visibility: hidden;
+}
+
+/* We will create a small HUD for 3D mode to show we are in 3D */
+#webgl-hud {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1000;
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    pointer-events: none;
+}
+
+body.webgl-active #webgl-hud {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.hud-btn {
+    pointer-events: auto;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 12px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.hud-btn:hover {
+    color: #fff;
+    border-color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+#nav-hint {
+    color: rgba(255, 255, 255, 0.4);
+    animation: fadeOutHint 8s forwards;
+}
+
+@keyframes fadeOutHint {
+    0% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+}

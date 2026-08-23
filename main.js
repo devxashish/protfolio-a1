@@ -1,3 +1,38 @@
+import { App } from './src/3d/app.js';
+
+function hasWebGLSupport() {
+    try {
+        const canvas = document.createElement('canvas');
+        return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+    } catch (e) {
+        return false;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (hasWebGLSupport() && !isReducedMotion) {
+        try {
+            window.webglApp = new App();
+            document.body.classList.add('webgl-active');
+            
+            // Allow users to force exit 3D mode
+            setTimeout(() => {
+                const exitBtn = document.getElementById('exit-3d-btn');
+                if (exitBtn) {
+                    exitBtn.addEventListener('click', () => {
+                        document.body.classList.remove('webgl-active');
+                        document.getElementById('webgl-container').style.display = 'none';
+                        window.webglApp.audio.enabled = false; // Mute audio if active
+                    });
+                }
+            }, 100);
+        } catch (e) {
+            console.error("WebGL Failed", e);
+        }
+    }
+});
+
 // Phase 3.1: World Design & Tactile Interactions - Hardened
 console.log('Phase 3.1 World Design initialized.');
 

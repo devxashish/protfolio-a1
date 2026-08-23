@@ -19,6 +19,11 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <div id="webgl-hud">
+        <button id="audio-toggle" class="hud-btn">SOUND: OFF</button>
+        <button id="exit-3d-btn" class="hud-btn">EXIT 3D MODE</button>
+        <div id="nav-hint">Scroll: Move / Drag: Look</div>
+    </div>
     <!-- Global Header & Navigation -->
     <header class="global-header">
       <div class="logo nav-links">
@@ -238,6 +243,7 @@
         </div>
       </footer>
 
-    <script src="main.js"></script>
+    <!-- 6. Interaction & Architecture Scripts -->
+    <script type="module" src="main.js"></script>
   </body>
 </html>
