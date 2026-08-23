@@ -115,3 +115,28 @@ export class BlueprintGenerator {
         return texture;
     }
 }
+
+    static createIdentityAlphaMap() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 2048;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+
+        // Black background (transparent to light in alpha map if inverted, wait:
+        // For alphaMap: white is opaque (blocks light), black is transparent (lets light through).
+        // If we want the SHADOW to spell ASHISH, the text must be WHITE (opaque) and the background BLACK (transparent).
+        
+        ctx.fillStyle = '#000000'; // Transparent to light
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = '#ffffff'; // Blocks light -> casts shadow
+        ctx.font = 'bold 300px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.letterSpacing = '20px';
+        ctx.fillText('ASHISH', canvas.width / 2, canvas.height / 2);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.anisotropy = 4;
+        return texture;
+    }

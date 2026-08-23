@@ -144,7 +144,33 @@ export class EntrySequence {
         this.overlay.style.height = '100%';
         this.overlay.style.zIndex = '9999';
         this.overlay.style.cursor = 'pointer';
+        this.overlay.style.display = 'flex';
+        this.overlay.style.alignItems = 'center';
+        this.overlay.style.justifyContent = 'center';
         document.body.appendChild(this.overlay);
+
+        const tapPrompt = document.createElement('div');
+        tapPrompt.textContent = "TAP OR SCROLL TO INITIATE";
+        tapPrompt.style.color = 'rgba(255,255,255,0.4)';
+        tapPrompt.style.fontFamily = 'monospace';
+        tapPrompt.style.letterSpacing = '4px';
+        tapPrompt.style.fontSize = '12px';
+        tapPrompt.style.animation = 'pulse 2s infinite';
+        this.overlay.appendChild(tapPrompt);
+        
+        // Add pulse animation
+        if (!document.getElementById('pulse-anim')) {
+            const style = document.createElement('style');
+            style.id = 'pulse-anim';
+            style.innerHTML = `
+                @keyframes pulse {
+                    0% { opacity: 0.2; }
+                    50% { opacity: 0.8; }
+                    100% { opacity: 0.2; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
 
         // Subtitle (hidden initially)
         this.subtitle = document.createElement('div');
@@ -294,6 +320,7 @@ export class EntrySequence {
         
         // Light moves from side/low to top/center to perfectly align the shadow
         this.spotlight.position.x = -8 + (ease * 8); // -8 to 0
+        this.spotlight.position.y = 2 + (ease * 6);  // 2 to 8
         this.spotlight.position.z = 8 - (ease * 4);  // 8 to 4
         
         // 3. Camera drifts forward and slightly down

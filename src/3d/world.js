@@ -64,29 +64,49 @@ export class World {
     this.scene.add(skylight);
   }
 
-  buildIdentityAnchor() {
+    buildIdentityAnchor() {
     const coreGroup = new THREE.Group();
     coreGroup.position.set(0, 0, 0);
     
-    const base = new THREE.Mesh(new THREE.BoxGeometry(4, 1, 4), this.mats.concrete);
-    base.position.set(0, 0.5, 0);
+    // Abstract physical blocks that just look like concrete architecture
+    const base = new THREE.Mesh(new THREE.BoxGeometry(10, 2, 4), this.mats.concrete);
+    base.position.set(0, 1, 0);
+    base.castShadow = true;
+    base.receiveShadow = true;
     coreGroup.add(base);
 
-    const pillar = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.5, 6, 8), this.mats.darkStone);
-    pillar.position.set(0, 4, 0);
-    coreGroup.add(pillar);
-
-    const bracketTop = new THREE.Mesh(new THREE.BoxGeometry(3, 0.5, 3), this.mats.steel);
-    bracketTop.position.set(0, 6.5, 0);
-    coreGroup.add(bracketTop);
+    const pillar1 = new THREE.Mesh(new THREE.BoxGeometry(2, 6, 2), this.mats.darkStone);
+    pillar1.position.set(-3, 5, 0);
+    pillar1.castShadow = true;
+    coreGroup.add(pillar1);
     
-    const bracketMid = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.5, 3.5), this.mats.steel);
-    bracketMid.position.set(0, 4, 0);
-    coreGroup.add(bracketMid);
+    const pillar2 = new THREE.Mesh(new THREE.BoxGeometry(2, 6, 2), this.mats.darkStone);
+    pillar2.position.set(3, 5, 0);
+    pillar2.castShadow = true;
+    coreGroup.add(pillar2);
 
-    const loadBeam = new THREE.Mesh(new THREE.BoxGeometry(24, 1, 4), this.mats.steel);
-    loadBeam.position.set(0, 7, 0);
+    const loadBeam = new THREE.Mesh(new THREE.BoxGeometry(12, 1, 3), this.mats.steel);
+    loadBeam.position.set(0, 8.5, 0);
+    loadBeam.castShadow = true;
     coreGroup.add(loadBeam);
+
+    // The Cinematic Trick: Invisible shadow caster plane
+    const alphaMap = BlueprintGenerator.createIdentityAlphaMap();
+    const shadowMat = new THREE.MeshBasicMaterial({
+        alphaMap: alphaMap,
+        alphaTest: 0.5,
+        colorWrite: false, // Don't render the plane itself
+        depthWrite: true   // Do render it to the depth buffer for shadows
+        ,side: THREE.DoubleSide
+    });
+    
+    const shadowCaster = new THREE.Mesh(new THREE.PlaneGeometry(16, 4), shadowMat);
+    // Position it hovering between the spotlight and the architecture
+    shadowCaster.position.set(0, 4, 2); 
+    shadowCaster.castShadow = true;
+    // Don't let it receive shadows, only cast them
+    shadowCaster.receiveShadow = false; 
+    coreGroup.add(shadowCaster);
 
     this.scene.add(coreGroup);
   }
