@@ -17,7 +17,7 @@ export class App {
     this.container.style.width = '100vw';
     this.container.style.height = '100vh';
     this.container.style.zIndex = '0'; 
-    this.container.style.pointerEvents = 'none'; 
+    this.container.style.pointerEvents = 'auto'; 
     document.body.prepend(this.container);
 
     this.scene = new THREE.Scene();
