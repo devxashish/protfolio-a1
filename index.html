@@ -3,20 +3,163 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Portfolio - Phase 1 Foundation</title>
+    <title>Portfolio - Someone Who Builds</title>
+    <meta name="description" content="Portfolio of a self-taught developer who builds things that work." />
     <link rel="stylesheet" href="normalize.css" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div id="app">
-      <header>
-        <h1>Portfolio</h1>
-        <p>Foundation initialized.</p>
-      </header>
-      <main>
-        <!-- Foundation structure ready for Phase 2 -->
-      </main>
-    </div>
+    <!-- Global Header & Navigation -->
+    <header class="global-header">
+      <div class="logo nav-links">
+        <a href="#hero">DEV.</a>
+      </div>
+      <nav class="nav-links">
+        <a href="#about">About</a>
+        <a href="#work">Work</a>
+        <a href="#skills">Skills</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main id="app">
+      <!-- 1. Hero Section -->
+      <section id="hero" class="hero container">
+        <div class="hero-grid">
+          <div class="hero-statement">
+            <!-- Symbolic core: bearing weight, holding steady. -->
+            <h1 class="headline-massive">BUILD<br/>ALMOST<br/>ANYTHING.</h1>
+          </div>
+          <div class="hero-meta">
+            <p class="text-meta">Self-Taught</p>
+            <p class="text-meta">Built Alone</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. About / Introduction -->
+      <section id="about" class="container">
+        <div class="about-grid">
+          <div>
+            <h2 class="headline-section">Identity</h2>
+          </div>
+          <div>
+            <p class="text-human">
+              Not an "AI Developer." Not a "Web Developer." I am someone who was always relied on, and turned that into the ability to build almost anything, alone. No formal education, no perfect conditions. Just learning fast and making it work.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Selected Work -->
+      <section id="work" class="container">
+        <h2 class="headline-section">Work</h2>
+        
+        <div class="project-list">
+          
+          <article class="project-item">
+            <div>
+              <h3 class="project-title">MS Security</h3>
+              <div class="text-meta">Full Backend App</div>
+            </div>
+            <div>
+              <p class="text-human" style="font-size: 1.25rem;">
+                A comprehensive security application featuring a complete backend infrastructure. Built from scratch based purely on technical necessity and craftsmanship.
+              </p>
+            </div>
+            <div>
+              <a href="#" class="project-demo-btn">Download APK</a>
+            </div>
+          </article>
+
+          <article class="project-item">
+            <div>
+              <h3 class="project-title">GET UNZIP</h3>
+              <div class="text-meta">Details Pending</div>
+            </div>
+            <div>
+              <p class="text-human" style="font-size: 1.25rem;">
+                Project architecture and execution details to be revealed. Built under constraints with a focus on core utility.
+              </p>
+            </div>
+            <div>
+              <a href="#" class="project-demo-btn">Live URL</a>
+            </div>
+          </article>
+
+          <article class="project-item">
+            <div>
+              <h3 class="project-title">Atlas UI</h3>
+              <div class="text-meta">Details Pending</div>
+            </div>
+            <div>
+              <p class="text-human" style="font-size: 1.25rem;">
+                Interface systems and visual architecture. More information on the implementation and technical stack coming soon.
+              </p>
+            </div>
+            <div>
+              <a href="#" class="project-demo-btn">View Demo</a>
+            </div>
+          </article>
+
+          <article class="project-item">
+            <div>
+              <h3 class="project-title">This Portfolio</h3>
+              <div class="text-meta">Living Digital World</div>
+            </div>
+            <div>
+              <p class="text-human" style="font-size: 1.25rem;">
+                Built entirely from a mobile phone. A personal environment designed to be tactile, atmospheric, and resilient.
+              </p>
+            </div>
+            <div>
+              <a href="#" class="project-demo-btn">Explore</a>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- 4. Skills / Capabilities -->
+      <section id="skills" class="container">
+        <div class="about-grid">
+          <div>
+            <h2 class="headline-section">Capabilities</h2>
+          </div>
+          <div>
+            <div class="skills-container">
+              <span class="skill-tag">Systems Architecture</span>
+              <span class="skill-tag">Backend Engineering</span>
+              <span class="skill-tag">Frontend Development</span>
+              <span class="skill-tag">Cybersecurity Basics</span>
+              <span class="skill-tag">IT Operations</span>
+              <span class="skill-tag">AI-Assisted Building</span>
+            </div>
+            <p class="text-meta" style="margin-top: var(--space-md);">
+              * Physical workshop presentation pending in future phases.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- 5. Footer & Contact CTA -->
+    <footer id="contact" class="footer container">
+        <div class="contact-grid">
+          <div>
+            <h2 class="headline-section" style="border-bottom: none; margin-bottom: var(--space-sm);">Connect</h2>
+            <p class="text-human" style="font-size: 1.25rem; margin-bottom: var(--space-md);">
+              Always reachable. Fast response.
+            </p>
+          </div>
+          <div class="contact-channels">
+            <a href="#" class="contact-link" data-primary="true">WhatsApp ↗</a>
+            <a href="#" class="contact-link">Book a Call ↗</a>
+            <a href="#" class="contact-link">Email ↗</a>
+          </div>
+        </div>
+      </footer>
+
     <script src="main.js"></script>
   </body>
 </html>
