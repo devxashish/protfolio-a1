@@ -365,6 +365,8 @@ export class Projects {
     this.artifacts.forEach((group, i) => {
         if (!group.userData.isStory) {
             group.position.y = group.userData.originalY + Math.sin(time + i) * 0.1;
+            group.rotation.x = Math.sin(time * 0.5 + i) * 0.05;
+            group.rotation.z = Math.cos(time * 0.6 + i) * 0.05;
         }
         const scaleTarget = (group === hovered) ? 1.05 : 1.0;
         group.scale.lerp(new THREE.Vector3(scaleTarget, scaleTarget, scaleTarget), delta * 10);
