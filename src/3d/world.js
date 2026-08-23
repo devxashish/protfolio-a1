@@ -6,22 +6,20 @@ export class World {
   constructor(scene) {
     this.scene = scene;
     
-    // 1. Initialize Materials ONCE
     this.mats = {
         concrete: MaterialSystem.getConcreteMaterial(0x2a2a2a, 1.0),
         darkStone: MaterialSystem.getConcreteMaterial(0x111111, 2.0),
         steel: MaterialSystem.getSteelMaterial(),
         wood: MaterialSystem.getWoodMaterial(),
-        doorGlow: new THREE.MeshBasicMaterial({ color: 0x4466aa })
+        doorGlow: new THREE.MeshBasicMaterial({ color: 0x4466aa, transparent: true, opacity: 0.5 })
     };
 
-    // 2. Initialize Geometries ONCE (Memory Optimization)
     this.geos = {
         rib: new THREE.BoxGeometry(1.5, 7, 1.5),
         beam: new THREE.BoxGeometry(24, 0.5, 1.5),
         wall: new THREE.BoxGeometry(1.5, 7, 10.5),
         alcoveFloor: new THREE.PlaneGeometry(10, 10),
-        blade: new THREE.BoxGeometry(2.1, 0.1, 7.8),
+        blade: new THREE.BoxGeometry(2.1, 0.15, 7.8),
         led: new THREE.BoxGeometry(0.05, 0.05, 0.05)
     };
 
@@ -96,7 +94,6 @@ export class World {
   buildMainSpine() {
     for (let i = 1; i <= 6; i++) {
         const zPos = -(i * 12); 
-        
         const isProjectAlcove = (zPos === -12 || zPos === -24 || zPos === -36); 
         const isStoryBranch = (zPos === -48); 
         
@@ -147,7 +144,6 @@ export class World {
 
   buildArchives() {
     const zBase = -40;
-    
     const curveGeo = new THREE.CylinderGeometry(15, 15, 7, 16, 1, false, 0, Math.PI / 2);
     const curve = new THREE.Mesh(curveGeo, this.mats.concrete);
     curve.position.set(20, 3.5, zBase + 10);
@@ -160,18 +156,16 @@ export class World {
     archiveFloor.receiveShadow = true;
     this.scene.add(archiveFloor);
 
-    // The Drafting Table (Interactive Story Artifact)
     this.storyArtifact = new THREE.Group();
     this.storyArtifact.position.set(21, 0, zBase);
     
     const tableTop = new THREE.Mesh(new THREE.BoxGeometry(6, 0.2, 4), this.mats.wood);
     tableTop.position.set(0, 2.5, 0);
-    tableTop.rotation.x = 0.2; // Tilted
+    tableTop.rotation.x = 0.2; 
     tableTop.castShadow = true;
     tableTop.receiveShadow = true;
     this.storyArtifact.add(tableTop);
     
-    // Blueprint on table
     const blueprintTex = BlueprintGenerator.createStoryBlueprint();
     const blueprintMat = new THREE.MeshStandardMaterial({
         map: blueprintTex,
@@ -196,7 +190,6 @@ export class World {
         isStory: true,
         hitBox: hitBox,
         originalY: 0, 
-        // Camera looks down at the blueprint from slightly above and in front
         focusPos: new THREE.Vector3(21, 5.5, zBase + 2.5), 
         focusRot: new THREE.Vector2(-Math.PI / 4, 0)
     };
@@ -212,21 +205,44 @@ export class World {
   buildArmory() {
     const zBase = -50;
     
-    const rackRecessGeo = new THREE.BoxGeometry(2, 6, 8);
+    const rackRecessGeo = new THREE.BoxGeometry(3, 6, 8);
     const rackRecess = new THREE.Mesh(rackRecessGeo, this.mats.steel);
-    rackRecess.position.set(-11, 3, zBase);
+    rackRecess.position.set(-11.5, 3, zBase);
     this.scene.add(rackRecess);
     
-    for (let j = 0; j < 10; j++) {
-        const blade = new THREE.Mesh(this.geos.blade, this.mats.darkStone);
-        blade.position.set(-11, 1 + (j * 0.4), zBase);
-        this.scene.add(blade);
+    const skills = [
+        "SYSTEMS ARCHITECTURE", 
+        "BACKEND ENGINEERING", 
+        "FRONTEND DEV", 
+        "C++ / RUST", 
+        "MOBILE ARCHITECTURE",
+        "CYBERSECURITY BASICS",
+        "AI-ASSISTED BUILDING",
+        "DATABASE DESIGN"
+    ];
+
+    skills.forEach((skill, j) => {
+        const blade = new THREE.Group();
+        blade.position.set(-11, 1.2 + (j * 0.5), zBase);
         
-        const ledMat = new THREE.MeshBasicMaterial({ color: j % 3 === 0 ? 0xffaa00 : 0x00ffaa });
+        const chassis = new THREE.Mesh(this.geos.blade, this.mats.darkStone);
+        blade.add(chassis);
+        
+        // Label mapped to front face
+        const labelTex = BlueprintGenerator.createServerLabel(skill, j + 1);
+        const labelMat = new THREE.MeshBasicMaterial({ map: labelTex });
+        const labelGeo = new THREE.PlaneGeometry(2, 0.12);
+        const labelMesh = new THREE.Mesh(labelGeo, labelMat);
+        labelMesh.position.set(0, 0, 3.91); 
+        blade.add(labelMesh);
+
+        const ledMat = new THREE.MeshBasicMaterial({ color: j % 2 === 0 ? 0x00ffaa : 0xffaa00 });
         const led = new THREE.Mesh(this.geos.led, ledMat);
-        led.position.set(-10.4, 1 + (j * 0.4), zBase + 3 - Math.random());
-        this.scene.add(led);
-    }
+        led.position.set(0.8, 0, 3.95);
+        blade.add(led);
+        
+        this.scene.add(blade);
+    });
   }
 
   buildThreshold() {
@@ -248,17 +264,35 @@ export class World {
     glow.position.set(2, 3.5, zBase - 0.9);
     this.scene.add(glow);
 
+    // Terminal Interaction setup
+    this.terminalArtifact = new THREE.Group();
+    this.terminalArtifact.position.set(5, 1.5, zBase);
+    
     const terminalGeo = new THREE.BoxGeometry(1.5, 3, 1);
     const terminal = new THREE.Mesh(terminalGeo, this.mats.steel);
-    terminal.position.set(5, 1.5, zBase);
     terminal.castShadow = true;
     terminal.receiveShadow = true;
-    this.scene.add(terminal);
+    this.terminalArtifact.add(terminal);
 
+    const screenTex = BlueprintGenerator.createTerminalScreen();
     const screenGeo = new THREE.PlaneGeometry(1.3, 1);
-    const screenMat = new THREE.MeshBasicMaterial({ color: 0x2244aa }); 
+    const screenMat = new THREE.MeshBasicMaterial({ map: screenTex }); 
     const screen = new THREE.Mesh(screenGeo, screenMat);
-    screen.position.set(5, 2.5, zBase + 0.51);
-    this.scene.add(screen);
+    screen.position.set(0, 1.0, 0.51);
+    this.terminalArtifact.add(screen);
+
+    const hitBox = new THREE.Mesh(new THREE.BoxGeometry(2.5, 4, 2), new THREE.MeshBasicMaterial({visible: false}));
+    hitBox.position.set(0, 1.0, 0.5);
+    this.terminalArtifact.add(hitBox);
+
+    this.terminalArtifact.userData = {
+        isTerminal: true,
+        hitBox: hitBox,
+        originalY: 1.5,
+        focusPos: new THREE.Vector3(5, 2.5, zBase + 2.0),
+        focusRot: new THREE.Vector2(0, 0)
+    };
+
+    this.scene.add(this.terminalArtifact);
   }
 }

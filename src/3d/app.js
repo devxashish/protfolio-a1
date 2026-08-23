@@ -41,6 +41,9 @@ export class App {
     this.weather = new Weather(this.scene);
     this.projects = new Projects(this.scene);
 
+    if (this.world.terminalArtifact) {
+        this.projects.artifacts.push(this.world.terminalArtifact);
+    }
     if (this.world.storyArtifact) {
         this.projects.artifacts.push(this.world.storyArtifact);
     }
