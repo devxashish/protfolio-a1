@@ -3,8 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Portfolio - Someone Who Builds</title>
-    <meta name="description" content="Portfolio of a self-taught developer who builds things that work." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>Dev Ashish | Self-Taught Software Engineer</title>
+    <meta name="description" content="Portfolio of a self-taught engineer who builds full-stack applications, physical interfaces, and tactile digital environments from scratch." />
+    
+    <!-- Open Graph Metadata -->
+    <meta property="og:title" content="Dev Ashish | Self-Taught Software Engineer" />
+    <meta property="og:description" content="Portfolio of a self-taught engineer who builds full-stack applications and tactile digital environments from scratch." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://devxashish.github.io/protfolio-a1/" />
+    
     <link rel="stylesheet" href="normalize.css" />
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -60,17 +69,36 @@
           <article class="project-item">
             <div class="project-reveal">RELEASE TO EXPLORE</div>
             <div class="project-surface">
-              <div>
+              <div class="project-header">
                 <h3 class="project-title">MS Security</h3>
-                <div class="text-meta">Full Backend App</div>
+                <div class="text-meta">Full Stack Application</div>
               </div>
-              <div>
-                <p class="text-human" style="font-size: 1.25rem;">
-                  A comprehensive security application featuring a complete backend infrastructure. Built from scratch based purely on technical necessity and craftsmanship.
-                </p>
+              
+              <div class="project-story">
+                <div class="story-block">
+                  <h4 class="text-meta" style="color: var(--text-primary); margin-bottom: var(--space-xs);">The Challenge</h4>
+                  <p class="text-human" style="font-size: 1.125rem;">
+                    Required a robust mobile application and backend infrastructure for a business environment, built from the ground up as a solo architect.
+                  </p>
+                </div>
+                
+                <div class="story-block" style="margin-top: var(--space-sm);">
+                  <h4 class="text-meta" style="color: var(--text-primary); margin-bottom: var(--space-xs);">The Build</h4>
+                  <p class="text-human" style="font-size: 1.125rem;">
+                    A comprehensive security application featuring complete backend integration. Engineered purely on technical necessity and craftsmanship alongside unrelated daily IT responsibilities.
+                  </p>
+                </div>
+
+                <div class="story-block" style="margin-top: var(--space-sm);">
+                  <h4 class="text-meta" style="color: var(--text-primary); margin-bottom: var(--space-xs);">Stack & Architecture</h4>
+                  <p class="text-human" style="font-size: 1.125rem; font-family: var(--font-body);">
+                    Mobile APK / Backend Service (Exact stack pending release documentation)
+                  </p>
+                </div>
               </div>
-              <div>
-                <a href="#" class="project-demo-btn">Download APK</a>
+
+              <div class="project-action" style="align-self: end;">
+                <a href="#" class="project-demo-btn">Download APK (Pending)</a>
               </div>
             </div>
           </article>
@@ -78,17 +106,23 @@
           <article class="project-item">
             <div class="project-reveal">RELEASE TO EXPLORE</div>
             <div class="project-surface">
-              <div>
+              <div class="project-header">
                 <h3 class="project-title">GET UNZIP</h3>
-                <div class="text-meta">Details Pending</div>
+                <div class="text-meta">Project Status: Locked</div>
               </div>
-              <div>
-                <p class="text-human" style="font-size: 1.25rem;">
-                  Project architecture and execution details to be revealed. Built under constraints with a focus on core utility.
+              <div class="project-story">
+                <p class="text-human" style="font-size: 1.125rem;">
+                  Project architecture and execution details are temporarily restricted. Full narrative and technical specifications will be revealed when ready.
                 </p>
+                <div class="story-block" style="margin-top: var(--space-sm);">
+                  <h4 class="text-meta" style="color: var(--text-primary); margin-bottom: var(--space-xs);">Stack & Architecture</h4>
+                  <p class="text-human" style="font-size: 1.125rem; font-family: var(--font-body); color: var(--text-secondary);">
+                    [ REDACTED PENDING RELEASE ]
+                  </p>
+                </div>
               </div>
-              <div>
-                <a href="#" class="project-demo-btn">Live URL</a>
+              <div class="project-action" style="align-self: end;">
+                <button class="project-demo-btn" disabled style="opacity: 0.5; cursor: not-allowed;">Live URL (Locked)</button>
               </div>
             </div>
           </article>
@@ -96,17 +130,23 @@
           <article class="project-item">
             <div class="project-reveal">RELEASE TO EXPLORE</div>
             <div class="project-surface">
-              <div>
+              <div class="project-header">
                 <h3 class="project-title">Atlas UI</h3>
-                <div class="text-meta">Details Pending</div>
+                <div class="text-meta">Project Status: Locked</div>
               </div>
-              <div>
-                <p class="text-human" style="font-size: 1.25rem;">
-                  Interface systems and visual architecture. More information on the implementation and technical stack coming soon.
+              <div class="project-story">
+                <p class="text-human" style="font-size: 1.125rem;">
+                  Interface systems and visual architecture project. Implementation details and the underlying technical stack are being finalized for publication.
                 </p>
+                <div class="story-block" style="margin-top: var(--space-sm);">
+                  <h4 class="text-meta" style="color: var(--text-primary); margin-bottom: var(--space-xs);">Stack & Architecture</h4>
+                  <p class="text-human" style="font-size: 1.125rem; font-family: var(--font-body); color: var(--text-secondary);">
+                    [ REDACTED PENDING RELEASE ]
+                  </p>
+                </div>
               </div>
-              <div>
-                <a href="#" class="project-demo-btn">View Demo</a>
+              <div class="project-action" style="align-self: end;">
+                <button class="project-demo-btn" disabled style="opacity: 0.5; cursor: not-allowed;">View Demo (Locked)</button>
               </div>
             </div>
           </article>
@@ -114,17 +154,36 @@
           <article class="project-item">
             <div class="project-reveal">RELEASE TO EXPLORE</div>
             <div class="project-surface">
-              <div>
+              <div class="project-header">
                 <h3 class="project-title">This Portfolio</h3>
-                <div class="text-meta">Living Digital World</div>
+                <div class="text-meta">Living Digital Environment</div>
               </div>
-              <div>
-                <p class="text-human" style="font-size: 1.25rem;">
-                  Built entirely from a mobile phone. A personal environment designed to be tactile, atmospheric, and resilient.
-                </p>
+              
+              <div class="project-story">
+                <div class="story-block">
+                  <h4 class="text-meta" style="color: var(--text-primary); margin-bottom: var(--space-xs);">The Challenge</h4>
+                  <p class="text-human" style="font-size: 1.125rem;">
+                    Demonstrate technical capability and design sensibility without relying on conventional templates, frameworks, or a traditional development setup.
+                  </p>
+                </div>
+                
+                <div class="story-block" style="margin-top: var(--space-sm);">
+                  <h4 class="text-meta" style="color: var(--text-primary); margin-bottom: var(--space-xs);">The Build</h4>
+                  <p class="text-human" style="font-size: 1.125rem;">
+                    Engineered entirely from a mobile phone. Features a custom 1D spring physics engine and dynamic real-time lighting mask mapped accurately to scroll depth, achieving physical weight without layout thrashing.
+                  </p>
+                </div>
+
+                <div class="story-block" style="margin-top: var(--space-sm);">
+                  <h4 class="text-meta" style="color: var(--text-primary); margin-bottom: var(--space-xs);">Stack & Architecture</h4>
+                  <p class="text-human" style="font-size: 1.125rem; font-family: var(--font-body);">
+                    Pure HTML / CSS / Vanilla JavaScript. Zero build steps.
+                  </p>
+                </div>
               </div>
-              <div>
-                <a href="#" class="project-demo-btn">Explore</a>
+
+              <div class="project-action" style="align-self: end;">
+                <a href="https://github.com/devxashish/protfolio-a1" class="project-demo-btn" target="_blank" rel="noopener noreferrer">Explore Source</a>
               </div>
             </div>
           </article>
