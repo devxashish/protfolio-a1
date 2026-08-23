@@ -5,6 +5,21 @@ export class Projects {
     this.scene = scene;
     this.artifacts = [];
     
+    // Memory Optimization: Shared geometries and materials
+    this.shared = {
+        deskMat: new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 }),
+        phoneGeo: new THREE.BoxGeometry(0.8, 1.6, 0.1),
+        monitorGeo: new THREE.BoxGeometry(2.5, 1.5, 0.1),
+        pedestalGeo: new THREE.CylinderGeometry(0.3, 0.4, 1.2),
+        deskGeo: new THREE.BoxGeometry(3, 1, 1),
+        standGeo: new THREE.CylinderGeometry(0.1, 0.2, 0.4),
+        baseGeo: new THREE.BoxGeometry(2.2, 0.2, 1.5),
+        planeGeo: new THREE.BoxGeometry(2, 0.05, 1.2),
+        hitBoxGeo: new THREE.BoxGeometry(4, 4, 4),
+        signGeo: new THREE.PlaneGeometry(2.5, 0.6),
+        hitBoxMat: new THREE.MeshBasicMaterial({visible: false})
+    };
+    
     const projectData = [
       { 
         id: 'ms-security', 
@@ -52,10 +67,8 @@ export class Projects {
 
     projectData.forEach((p, i) => {
         const artifact = this.createArtifact(p);
-        
         artifact.position.set(-16, 1.5, p.z + 6);
         artifact.rotation.y = Math.PI / 2;
-        
         artifact.userData = { ...p, originalY: 1.5, isProject: true };
         this.scene.add(artifact);
         this.artifacts.push(artifact);
@@ -70,33 +83,29 @@ export class Projects {
 
   createArtifact(data) {
     const group = new THREE.Group();
-    let geo;
     const mat = new THREE.MeshStandardMaterial({ color: data.color, roughness: 0.2, metalness: 0.8 });
-    const deskMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
     
     if (data.type === 'phone') {
-        geo = new THREE.BoxGeometry(0.8, 1.6, 0.1); 
-        const mesh = new THREE.Mesh(geo, mat);
+        const mesh = new THREE.Mesh(this.shared.phoneGeo, mat);
         mesh.position.y = 1.2;
         mesh.castShadow = true;
         group.add(mesh);
         
-        const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 1.2), deskMat);
+        const pedestal = new THREE.Mesh(this.shared.pedestalGeo, this.shared.deskMat);
         pedestal.position.y = 0.6;
         pedestal.castShadow = true;
         group.add(pedestal);
         group.userData.hitMesh = mesh;
     } else if (data.type === 'monitor') {
-        geo = new THREE.BoxGeometry(2.5, 1.5, 0.1); 
-        const mesh = new THREE.Mesh(geo, mat);
+        const mesh = new THREE.Mesh(this.shared.monitorGeo, mat);
         mesh.position.y = 1.6;
         mesh.castShadow = true;
         
-        const desk = new THREE.Mesh(new THREE.BoxGeometry(3, 1, 1), deskMat);
+        const desk = new THREE.Mesh(this.shared.deskGeo, this.shared.deskMat);
         desk.position.y = 0.5;
         desk.castShadow = true;
         
-        const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.2, 0.4), deskMat);
+        const stand = new THREE.Mesh(this.shared.standGeo, this.shared.deskMat);
         stand.position.y = 1.2;
         
         group.add(mesh);
@@ -104,13 +113,13 @@ export class Projects {
         group.add(desk);
         group.userData.hitMesh = mesh;
     } else if (data.type === 'stack') {
-        const base = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.2, 1.5), deskMat);
+        const base = new THREE.Mesh(this.shared.baseGeo, this.shared.deskMat);
         base.position.y = 0.1;
         group.add(base);
         
         const meshGroup = new THREE.Group();
         for (let i = 0; i < 3; i++) {
-            const plane = new THREE.Mesh(new THREE.BoxGeometry(2, 0.05, 1.2), mat);
+            const plane = new THREE.Mesh(this.shared.planeGeo, mat);
             plane.position.y = 1.0 + (i * 0.4);
             plane.rotation.x = Math.PI / 8;
             plane.castShadow = true;
@@ -120,10 +129,7 @@ export class Projects {
         group.userData.hitMesh = meshGroup;
     } 
     
-    const hitBox = new THREE.Mesh(
-        new THREE.BoxGeometry(4, 4, 4), 
-        new THREE.MeshBasicMaterial({visible: false})
-    );
+    const hitBox = new THREE.Mesh(this.shared.hitBoxGeo, this.shared.hitBoxMat);
     hitBox.position.y = 1.5;
     group.add(hitBox);
     group.userData.hitBox = hitBox;
@@ -156,15 +162,13 @@ export class Projects {
     texture.minFilter = THREE.LinearMipmapLinearFilter;
     texture.magFilter = THREE.LinearFilter;
     
-    const geo = new THREE.PlaneGeometry(2.5, 0.6);
     const material = new THREE.MeshStandardMaterial({ 
         map: texture, 
         roughness: 0.1, 
         metalness: 0.8,
         emissive: 0x111111 
     });
-    const mesh = new THREE.Mesh(geo, material);
-    return mesh;
+    return new THREE.Mesh(this.shared.signGeo, material);
   }
 
   setupInteraction() {
@@ -207,17 +211,19 @@ export class Projects {
     if (artifact) {
         if (app.cameraController.isFocused) return;
         
-        // 1. Enter Focus Mode
-        const focusPos = new THREE.Vector3(-12, 1.5, artifact.position.z);
-        const focusRot = new THREE.Vector2(0, Math.PI / 2);
-        app.cameraController.focusOn(focusPos, focusRot);
-        
-        // 2. Show UI
-        this.showProjectInfo(artifact.userData, app);
+        if (artifact.userData.isStory) {
+            app.cameraController.focusOn(artifact.userData.focusPos, artifact.userData.focusRot);
+            this.showBackOverlay(app);
+        } else {
+            const focusPos = new THREE.Vector3(-12, 1.5, artifact.position.z);
+            const focusRot = new THREE.Vector2(0, Math.PI / 2);
+            app.cameraController.focusOn(focusPos, focusRot);
+            this.showProjectInfo(artifact.userData, app);
+        }
     }
   }
 
-  showProjectInfo(data, app) {
+  createBaseOverlay() {
     const overlay = document.createElement('div');
     overlay.id = 'project-focus-overlay';
     overlay.style.position = 'fixed';
@@ -238,6 +244,53 @@ export class Projects {
     overlay.style.opacity = '0';
     overlay.style.transform = 'translateX(20px)';
     overlay.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    return overlay;
+  }
+
+  createBackButton(overlay, app) {
+    const backBtn = document.createElement('button');
+    backBtn.textContent = 'BACK TO SPINE';
+    backBtn.style.padding = '10px 20px';
+    backBtn.style.background = 'transparent';
+    backBtn.style.color = '#888';
+    backBtn.style.border = '1px solid #333';
+    backBtn.style.cursor = 'pointer';
+    backBtn.style.fontWeight = 'bold';
+    backBtn.style.fontSize = '12px';
+    backBtn.style.letterSpacing = '1px';
+    
+    backBtn.onmouseover = () => { backBtn.style.color = '#fff'; backBtn.style.borderColor = '#888'; };
+    backBtn.onmouseout = () => { backBtn.style.color = '#888'; backBtn.style.borderColor = '#333'; };
+
+    backBtn.onclick = () => {
+        overlay.style.opacity = '0';
+        overlay.style.transform = 'translateX(20px)';
+        setTimeout(() => overlay.remove(), 500);
+        app.cameraController.exitFocus();
+    };
+    
+    return backBtn;
+  }
+
+  showBackOverlay(app) {
+    const overlay = this.createBaseOverlay();
+    overlay.style.justifyContent = 'flex-end'; 
+    overlay.style.paddingBottom = '60px';
+    overlay.style.background = 'linear-gradient(0deg, rgba(10,10,10,0.95) 0%, rgba(0,0,0,0) 50%)'; 
+    overlay.style.maxWidth = '100%';
+    overlay.style.alignItems = 'center';
+    
+    const backBtn = this.createBackButton(overlay, app);
+    overlay.appendChild(backBtn);
+    
+    document.body.appendChild(overlay);
+    void overlay.offsetWidth;
+    overlay.style.opacity = '1';
+    overlay.style.transform = 'translateY(0)'; 
+  }
+
+  showProjectInfo(data, app) {
+    const overlay = this.createBaseOverlay();
 
     const title = document.createElement('h2');
     title.textContent = data.name;
@@ -292,26 +345,7 @@ export class Projects {
     launchBtn.style.letterSpacing = '1px';
     launchBtn.style.borderRadius = '2px';
 
-    const backBtn = document.createElement('button');
-    backBtn.textContent = 'BACK TO SPINE';
-    backBtn.style.padding = '10px 20px';
-    backBtn.style.background = 'transparent';
-    backBtn.style.color = '#888';
-    backBtn.style.border = '1px solid #333';
-    backBtn.style.cursor = 'pointer';
-    backBtn.style.fontWeight = 'bold';
-    backBtn.style.fontSize = '12px';
-    backBtn.style.letterSpacing = '1px';
-    
-    backBtn.onmouseover = () => { backBtn.style.color = '#fff'; backBtn.style.borderColor = '#888'; };
-    backBtn.onmouseout = () => { backBtn.style.color = '#888'; backBtn.style.borderColor = '#333'; };
-
-    backBtn.onclick = () => {
-        overlay.style.opacity = '0';
-        overlay.style.transform = 'translateX(20px)';
-        setTimeout(() => overlay.remove(), 500);
-        app.cameraController.exitFocus();
-    };
+    const backBtn = this.createBackButton(overlay, app);
 
     btnWrapper.appendChild(launchBtn);
     btnWrapper.appendChild(backBtn);
@@ -319,7 +353,6 @@ export class Projects {
     
     document.body.appendChild(overlay);
 
-    // Trigger reflow for animation
     void overlay.offsetWidth;
     overlay.style.opacity = '1';
     overlay.style.transform = 'translateX(0)';
@@ -330,10 +363,9 @@ export class Projects {
     const hovered = this.getHoveredArtifact(camera);
 
     this.artifacts.forEach((group, i) => {
-        // Idle hover animation
-        group.position.y = group.userData.originalY + Math.sin(time + i) * 0.1;
-        
-        // Highlight if hovered
+        if (!group.userData.isStory) {
+            group.position.y = group.userData.originalY + Math.sin(time + i) * 0.1;
+        }
         const scaleTarget = (group === hovered) ? 1.05 : 1.0;
         group.scale.lerp(new THREE.Vector3(scaleTarget, scaleTarget, scaleTarget), delta * 10);
     });

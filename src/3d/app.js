@@ -16,8 +16,8 @@ export class App {
     this.container.style.left = '0';
     this.container.style.width = '100vw';
     this.container.style.height = '100vh';
-    this.container.style.zIndex = '-1'; // Behind HTML
-    this.container.style.pointerEvents = 'none'; // Let pointer events pass through initially
+    this.container.style.zIndex = '-1'; 
+    this.container.style.pointerEvents = 'none'; 
     document.body.prepend(this.container);
 
     this.scene = new THREE.Scene();
@@ -27,8 +27,7 @@ export class App {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     
-    // Performance constraints
-    const dpr = Math.min(window.devicePixelRatio, 2); // Cap at 2 for performance
+    const dpr = Math.min(window.devicePixelRatio, 2); 
     this.renderer.setPixelRatio(dpr);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -37,19 +36,19 @@ export class App {
 
     this.clock = new THREE.Clock();
 
-    // Systems
     this.lighting = new Lighting(this.scene);
     this.world = new World(this.scene);
     this.weather = new Weather(this.scene);
     this.projects = new Projects(this.scene);
 
-    // Initialize Audio
+    if (this.world.storyArtifact) {
+        this.projects.artifacts.push(this.world.storyArtifact);
+    }
+
     this.audio = new AudioSystem();
 
-    // Check reduced motion
     this.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Initialize Entry Sequence
     if (!this.prefersReducedMotion) {
         this.entry = new EntrySequence(this);
     }
@@ -61,7 +60,6 @@ export class App {
   bindEvents() {
     window.addEventListener('resize', this.onWindowResize.bind(this), false);
     
-    // Project hover/click audio events
     let lastHovered = null;
     window.addEventListener('projectHover', (e) => {
         this.projects.pointer = e.detail;
@@ -109,7 +107,6 @@ export class App {
         this.weather.update(delta, time);
         this.projects.update(delta, this.cameraController.camera);
         
-        // Audio updates
         if (this.audio && this.audio.enabled) {
             const camVel = Math.abs(this.cameraController.targetZ - this.cameraController.currentZ);
             this.audio.updateFootsteps(delta, camVel);

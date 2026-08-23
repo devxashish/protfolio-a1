@@ -19,6 +19,20 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+
+    <!-- HUD Overlay -->
+    <div id="hud-container">
+        <div class="hud-top">
+            <div class="hud-branding">ASHISH</div>
+            <div class="hud-role">SOFTWARE ENGINEER</div>
+        </div>
+        <div class="hud-bottom">
+            <div class="hud-coordinates" style="color: rgba(255, 255, 255, 0.4); font-size: 10px; font-family: monospace;">SYS_ONLINE</div>
+            <button id="audio-toggle" class="hud-btn">SOUND: OFF</button>
+        </div>
+    </div>
+
+    <div id="legacy-2d-portfolio">
     <div id="webgl-hud">
         <button id="audio-toggle" class="hud-btn">SOUND: OFF</button>
         <button id="exit-3d-btn" class="hud-btn">EXIT 3D MODE</button>
@@ -244,6 +258,7 @@
       </footer>
 
     <!-- 6. Interaction & Architecture Scripts -->
+    </div>
     <script type="module" src="main.js"></script>
   </body>
 </html>
