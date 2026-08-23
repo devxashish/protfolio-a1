@@ -24,6 +24,7 @@
 | Accessibility: reduced-motion fallback required | Owner's own choice | No fallback (rejected) | No — confirmed |
 | Scalability: optimize for current project set, not future-proofed | Owner's own choice | Build for infinite scale now (rejected — premature) | No — confirmed |
 | Technology stack | Not yet chosen — process locked (see 17_TECHNOLOGY_DECISIONS.md) | — | **YES — Phase 4** |
+| Foundation Tech Stack | Plain HTML/CSS/Vanilla JS (No build step) | Fits mobile-only authoring constraint perfectly, avoids bundler container errors, maximizes maintainability. | No — established for Phase 1 |
 
 *(A single status column isn't used here since this is a living document
 updated in place — every row above reflects the current state as of this

@@ -1,0 +1,42 @@
+:root {
+  /* Day Mode (Default for Phase 1 base) */
+  --color-bg: #f9f9f9;
+  --color-surface: #ffffff;
+  --color-text-primary: #111111;
+  --color-text-secondary: #555555;
+  --color-accent: #0055ff; /* Example accent, to be refined */
+
+  /* Typography placeholders */
+  --font-display: system-ui, -apple-system, sans-serif;
+  --font-body: system-ui, -apple-system, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #111111;
+    --color-surface: #1a1a1a;
+    --color-text-primary: #eeeeee;
+    --color-text-secondary: #999999;
+    --color-accent: #3377ff;
+  }
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+#app {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
