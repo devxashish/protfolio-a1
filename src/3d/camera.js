@@ -4,78 +4,97 @@ export class CameraController {
   constructor(app) {
     this.app = app;
     this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.camera.position.set(0, 1.7, 15); // Start further back
-
-    this.targetZ = 5;
+    
+    // Translation targets
+    this.targetX = 0;
+    this.currentX = 0;
+    this.targetY = 1.5;
+    this.currentY = 1.5;
+    this.targetZ = 15;
     this.currentZ = 15;
+    
+    this.camera.position.set(this.currentX, this.currentY, this.currentZ);
+
+    this.enabled = true;
+    this.isFocused = false; // Are we in Focus Mode?
+    
+    // Rotation bases (where the camera should look, before parallax)
+    this.baseRotationX = 0;
+    this.baseRotationY = 0;
+
+    // Parallax input offsets
+    this.parallaxX = 0;
+    this.parallaxY = 0;
     
     this.targetRotation = new THREE.Vector2(0, 0);
     this.currentRotation = new THREE.Vector2(0, 0);
     
     this.isDragging = false;
-    this.previousMousePosition = { x: 0, y: 0 };
+    this.previousTouch = { x: 0, y: 0 };
 
-    this.maxScroll = 1;
     this.bindEvents();
-    this.calculateScrollScale();
-  }
-
-  calculateScrollScale() {
-    const bodyHeight = document.body.scrollHeight;
-    const windowHeight = window.innerHeight;
-    this.maxScroll = Math.max(1, bodyHeight - windowHeight);
   }
 
   bindEvents() {
-    // Desktop wheel
+    // Desktop wheel (only moves Z if not focused)
     window.addEventListener('wheel', (e) => {
+      if (!this.enabled || this.isFocused) return;
       this.targetZ -= e.deltaY * 0.02;
       this.clampZ();
     }, { passive: true });
 
-    // Touch events for Z movement and Look
+    // Touch events
     document.addEventListener('touchstart', (e) => {
+      if (!this.enabled) return;
       this.isDragging = true;
       this.previousTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     }, { passive: true });
 
     document.addEventListener('touchmove', (e) => {
-      if (!this.isDragging) return;
+      if (!this.enabled || !this.isDragging) return;
       const currentTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
       const deltaX = currentTouch.x - this.previousTouch.x;
       const deltaY = currentTouch.y - this.previousTouch.y;
       
-      // Vertical swipe -> move Z
-      if (Math.abs(deltaY) > Math.abs(deltaX)) {
-        this.targetZ += deltaY * 0.05;
-        this.clampZ();
-      } 
-      // Horizontal swipe -> look
-      else {
-        this.targetRotation.y -= deltaX * 0.005;
-        this.targetRotation.x -= deltaY * 0.005;
-        this.targetRotation.x = Math.max(-Math.PI/4, Math.min(Math.PI/4, this.targetRotation.x));
+      if (!this.isFocused) {
+          // Vertical swipe -> move Z
+          if (Math.abs(deltaY) > Math.abs(deltaX)) {
+            this.targetZ += deltaY * 0.05;
+            this.clampZ();
+          } 
+          // Horizontal swipe -> look (parallax)
+          else {
+            this.parallaxX -= deltaX * 0.005;
+            this.parallaxY -= deltaY * 0.005;
+            this.parallaxY = Math.max(-Math.PI/4, Math.min(Math.PI/4, this.parallaxY));
+          }
+      } else {
+          // If focused, horizontal swipe rotates slightly around the object
+          this.parallaxX -= deltaX * 0.002;
       }
       
       this.previousTouch = currentTouch;
     }, { passive: true });
 
     document.addEventListener('touchend', () => {
+      if (!this.enabled) return;
       this.isDragging = false;
-      this.targetRotation.set(0, 0); // Auto center
+      this.parallaxX = 0;
+      this.parallaxY = 0;
     });
 
     // Desktop mouse look
     document.addEventListener('mousemove', (e) => {
-      if (this.isDragging) return;
+      if (!this.enabled || this.isDragging) return;
       const normalizedX = (e.clientX / window.innerWidth) * 2 - 1;
       const normalizedY = -(e.clientY / window.innerHeight) * 2 + 1;
-      this.targetRotation.y = -normalizedX * 0.1;
-      this.targetRotation.x = normalizedY * 0.1;
+      this.parallaxX = -normalizedX * 0.05; // Reduced from 0.1 for elegance
+      this.parallaxY = normalizedY * 0.05;
     });
     
-    // Keyboard navigation (up/down arrows)
+    // Keyboard navigation
     document.addEventListener('keydown', (e) => {
+        if (!this.enabled || this.isFocused) return;
         if (e.key === 'ArrowUp') {
             this.targetZ += 2;
             this.clampZ();
@@ -90,25 +109,22 @@ export class CameraController {
     this.targetZ = Math.max(-75, Math.min(15, this.targetZ));
   }
 
-  transitionTo(position, url) {
-    if (this.isTransitioning) return;
-    this.isTransitioning = true;
-    
-    // Animate Z to be just in front of the object
-    this.targetZ = position.z + 2; 
-    
-    // Auto center
-    this.targetRotation.set(0, 0);
+  focusOn(position, rotation) {
+    this.isFocused = true;
+    this.targetX = position.x;
+    this.targetY = position.y;
+    this.targetZ = position.z;
+    this.baseRotationX = rotation.x;
+    this.baseRotationY = rotation.y;
+  }
 
-    // Give the camera 1.5 seconds to move, then transition URL
-    setTimeout(() => {
-        window.location.href = url; // "then navigate to the verified live URL. Do NOT directly call window.open() on first click."
-        
-        // Reset after a delay in case user navigates back
-        setTimeout(() => {
-            this.isTransitioning = false;
-        }, 1000);
-    }, 1500);
+  exitFocus() {
+    this.isFocused = false;
+    this.targetX = 0;
+    this.targetY = 1.5;
+    // targetZ remains where it was before focusing (or slightly adjusted if we want)
+    this.baseRotationX = 0;
+    this.baseRotationY = 0;
   }
 
   resize() {
@@ -117,14 +133,20 @@ export class CameraController {
   }
 
   update(delta) {
-    // If transitioning, override Z spring to move directly in front of target
-    // Lower lerp factor (2 for regular movement, 1.5 for transition) makes camera feel heavier and smoother
-    const zFactor = this.isTransitioning ? 1.5 : 3.0; 
-    this.currentZ += (this.targetZ - this.currentZ) * zFactor * delta;
-    this.camera.position.z = this.currentZ;
+    // 3D Spring Translation
+    const speed = this.isFocused ? 2.5 : 4.0; // Slower, heavier move into focus
+    
+    this.currentX += (this.targetX - this.currentX) * speed * delta;
+    this.currentY += (this.targetY - this.currentY) * speed * delta;
+    this.currentZ += (this.targetZ - this.currentZ) * speed * delta;
+    this.camera.position.set(this.currentX, this.currentY, this.currentZ);
+
+    // Rotation calculation
+    this.targetRotation.y = this.baseRotationY + this.parallaxX;
+    this.targetRotation.x = this.baseRotationX + this.parallaxY;
 
     // Heavy spring rotation
-    this.currentRotation.lerp(this.targetRotation, 3.5 * delta);
+    this.currentRotation.lerp(this.targetRotation, speed * delta);
     
     this.camera.rotation.set(0, 0, 0); // Reset
     this.camera.rotateY(this.currentRotation.y);

@@ -1,138 +1,89 @@
-# WORLD DESIGN
-*(covers World, Physics, Materials, Motion, Camera, Lighting, and Sound
-systems — grouped together as one interaction language; see 00_AUDIT.md)*
+# WORLD DESIGN & EXPERIENCE ARCHITECTURE
 
-## World type — a living digital world
-Not locked to a single literal room. The world is a **living digital
-world**: a personal environment is the first space the visitor enters, but
-the concept can expand into other environments or "dimensions" for
-different sections (a project space, an about space, a skills space, a
-contact space) — all part of one continuous world, not separate pages.
+## PHASE 6.7 ARCHITECTURE SPECIFICATION (STORY, BRANCHING & NARRATIVE)
 
-The foundation of that first (and likely recurring) environment is a
-**physically real atmosphere** — a real-life day/night cycle, including
-weather (rain confirmed as wanted); light, shadow, and mood shift the way
-they would outdoors. On top of this realism sits one additional
-symbolic/extra layer (still open — see Open Questions) that keeps the
-world from reading as a plain simulation.
+This specification defines the physical environments, transitions, and narrative logic for the entire portfolio world, ensuring it remains a professional portfolio rather than a puzzle game. 
 
-## Reference interactions (from the person's own taste)
-Two references were given, both instructive:
-1. **A site where any section can be physically grabbed and torn**, with
-   real physics — not decorative animation, but a section that responds
-   like an actual physical object would.
-2. **A room-environment portfolio where the visitor walks in and turns the
-   light on**, with realistic light behavior.
+### 1. STORY ENVIRONMENT (The Archives)
+- **Concept:** A warmer, more intimate space branching off the brutalist main spine, representing the human element, self-taught journey, and underlying ethos.
+- **Visual Language:** A shift from raw concrete to warm, aged wood and soft, low-hanging pendant lighting. 
 
-Both share a pattern: **physics and light are the interaction**, not a
-layer on top of static content. This is the direction for this world —
-interactions should feel like manipulating something real, not triggering
-a pre-baked animation.
+### 2. STORY ENTRY TRANSITION
+- **Logic:** Located at `Z = -40` as a right-hand branching path. 
+- **Transition:** As the user scrolls into the branch zone, a soft, curved concrete wall gently occludes the main spine, physically guiding the camera into the Archives. 
+- **Discoverability:** The Story branch is immediately visible from the main spine via warm light spilling out and clear architectural sightlines. The user is never forced to enter, but the visual cues naturally invite exploration.
 
-## Symbolic moment — the weight
-The opening (and recurring motif) should carry the idea of someone bearing
-weight alone and holding steady under it. Concretely, this suggests
-**gravity, load-bearing, and balance** as the physics vocabulary — an
-object (or the "camera-self") is under real weight, and the visitor
-watches it stay upright, supported, in control. This should read as
-quiet strength, not struggle. This motif is expressed purely
-atmospherically — see 01_PORTFOLIO_VISION.md, "Symbolic core" — no text
-anywhere states the underlying family story.
+### 3. STORY PHYSICAL OBJECTS
+- **The Drafting Table:** A massive, tilted wooden architectural drafting table.
+- **The Blueprints:** Scattered, overlapping cyanotype blueprints pinned to walls and resting on the table.
 
-Rain (from the weather-cycle requirement) can be timed to reinforce this
-moment rather than sit as generic ambiance — weather as emotional
-punctuation, used sparingly.
+### 4. STORY INFORMATION ARCHITECTURE
+- **Delivery:** Information is not presented as standard HTML paragraphs. It is physically drafted onto the blueprints. 
+- **Content:** The text explains the "self-taught, built alone, resilient" narrative. It answers *how* Ashish thinks, not just what he does. The text is highly legible, high-contrast, and baked into anisotropic `CanvasTexture` planes.
 
-## Physics system
-Physics is used only where it serves storytelling, material realism,
-navigation, or the symbolic weight-bearing motif — never decoratively.
-Every physics interaction, once designed in Phase 3, should be documented
-against this template:
+### 5. STORY INTERACTION MODEL
+- **Friction:** Camera momentum is subjected to higher friction upon entering the Archives to encourage observation.
+- **Focus:** Clicking the drafting table triggers the spring-physics camera to gently pull in over the blueprints. An easy, obvious "BACK/EXIT" action is provided to return to the walking path without disorientation.
 
-- **What** — the interaction
-- **Why** — the reason it exists (never "looks cool" alone)
-- **Material** — what it's made of
-- **User action** — what the visitor does
-- **Physical response** — what happens, in physical terms
-- **Cinematic purpose** — what it communicates emotionally/narratively
-- **Performance cost** — rough weight of the interaction
-- **Mobile behavior** — how it adapts on phones
-- **Fallback behavior** — reduced-motion / low-power version
+### 6. BRANCHING/NAVIGATION LOGIC
+- **The Main Spine:** The un-missable central artery. Moving purely forward via Z-scroll guarantees the user will see every core capability. 
+- **Discoverability:** Critical portfolio information is never invisible. Signage, light pooling, and object silhouettes ensure the user understands what lies in an alcove even from the main spine. 
 
-Two interactions are already implied by the owner's own reference sites
-and should be the first candidates for this template in Phase 3:
-1. A **grab/tear interaction** on sections — real physics response, not a
-   canned animation.
-2. A **light-on reveal** — walking into a space and having light behave
-   realistically as it turns on, tied to the day/night system.
+### 7. SKILLS ENVIRONMENT (The Armory/Server Room)
+- **Concept:** Skills are tools of the trade, not arbitrary percentages or giant tech logos.
+- **Location:** Integrated directly into the walls of the Main Spine at `Z = -50`.
+- **Physical Representation:** Recessed industrial server racks, technical drawings, code fragments, and blueprint annotations. Technology names are subtly integrated into physical computing elements rather than plastered as giant billboard logos. 
 
-Anything not clearly serving story, navigation, or realism should default
-to plain CSS/JS, not a physics engine.
+### 8. PROJECTS ENVIRONMENT (The Physical Portfolio)
+- **Location:** Left branching alcoves off the Main Spine (`X = -10, Z varying`).
+- **Physical Representation:** Each project has a bespoke artifact reflecting its nature (GET UNZIP = Workstation Desk; MS Security = Mobile device on robotic arm).
+- **Information Layer:** Every project artifact provides clear, discoverable business information (What it is, What I built, Technology/Role, Key Capability, Live Demo). Clarity is never sacrificed for cinematic visuals.
+- **Interaction (Focus Mode):** Intentional hover (subtle physical response) and click/tap to enter Focus Mode. Focus mode provides a clear visual hierarchy, readable project info, and a frictionless exit/back action without violent camera movement. Mobile accidental touches are safely ignored.
 
-## Material system
-Given the resilience / self-built / no-shortcuts narrative:
-- **Raw, unfinished wood or stone** — visibly shaped over time rather than
-  factory-smooth. Fits "self-taught, built alone."
-- **Weathered metal** (brushed, worn at the edges, not chrome-shiny) for
-  precision-oriented moments (skills, security work).
-- Glass and liquid used sparingly if at all — they read as fragile/soft,
-  which works against the resilience theme; reserved only for a specific
-  moment that calls for transparency or fluidity, not a default material.
+### 9. CONTACT/EXIT ENVIRONMENT (The Threshold)
+- **Location:** The absolute end of the Main Spine (`Z = -75`).
+- **Physical Representation:** A massive, heavy steel door, cracked open by an inch. Intense, cool daylight spills through the crack. Next to the door rests a sleek, illuminated communications terminal.
+- **Conversion Strategy:** The final terminal is the premium cinematic CTA. However, contacting the owner *never* requires traveling to Z=-75. An unobtrusive, persistent CONTACT access mechanism (HUD layer) is available at all times. Both routes provide immediate, frictionless access to WhatsApp, Email, and Booking. No puzzles, no waiting.
 
-This is a proposal (Claude's judgment, as requested) — to be confirmed in
-Phase 3 against the finalized color and lighting systems.
+### 10. TRANSITIONS BETWEEN ENVIRONMENTS
+- **Seamless Continuity:** No loading screens or teleports. Every transition is physical camera movement. 
 
-## Motion & camera system
-Motion should always read as **revealing something that already exists**,
-not "playing an animation." Concretely:
-- Camera position/depth is driven by real scroll or interaction input, not
-  a fixed timeline — the visitor's own movement uncovers the 3D space.
-- Transitions between environments (e.g. personal space → project space)
-  should feel like moving through a world, not cutting between pages.
-- No motion exists purely for spectacle — every camera or object movement
-  should map to either navigation, storytelling, or physical realism.
+### 11. DESKTOP BEHAVIOR
+- **Movement:** Mouse wheel / trackpad strictly drives the Z-axis. 
+- **Look:** Click and drag allows looking.
+- **Micro-Parallax:** Passive mouse movement shifts the camera slightly.
 
-## Lighting system
-Lighting is a first-class system, not a cosmetic layer, given the
-"walk in and turn the light on" reference:
-- Day mode: natural, higher-contrast light, closer to real daylight
-  behavior.
-- Night mode: light sources read as deliberate — turning a light on is an
-  event, not ambient fill.
-- Weather (rain) should visibly affect lighting — diffused, moodier light
-  during rain versus clear conditions.
-- Lighting and the color system are linked (see 10_COLOR_TYPOGRAPHY_SYSTEM.md)
-  — accent colors are expected to shift in how they read under day vs.
-  night lighting rather than being flat, fixed values.
+### 12. MOBILE BEHAVIOR
+- **Movement:** Vertical swipe translates the camera with high friction.
+- **Look:** Horizontal swipe rotates the camera (with deadzone).
+- **Parallax:** Disabled by default to prevent battery drain.
 
-## Navigation model
-A **guided path with choice points** — a linear throughline so no visitor
-gets lost or has to hunt for the way forward, but with moments where the
-visitor can branch off to explore (a project in more depth, a skill, an
-easter egg) before rejoining the path. This matches the "intuitive but
-surprising" requirement from the brief — never a maze, but never flatly
-linear either.
+### 13. ACCESSIBILITY / FALLBACK BEHAVIOR
+- **Reduced Motion / WebGL Failure:** The 3D canvas is completely unmounted. The visitor experiences the high-polish, performant 2D DOM portfolio.
 
-## Sound
-Atmospheric/ambient only — rain, wind, distant tone, room-tone shifts
-between day and night. No interactive click/tap sounds. Sound must be
-user-controllable (mute) and never autoplay aggressively.
+### 14. PERFORMANCE BUDGET
+- **Strategy:** Performance > Polygon Count. Measured using frame time, FPS stability, draw calls, texture/GPU memory, shader complexity, and mobile thermal behavior. 
+- **Graceful Degradation:** Desktop receives higher visual fidelity (bloom, soft shadows). Mobile receives a strictly optimized equivalent to guarantee smooth interaction on modern devices. 
 
-## Easter eggs
-Confirmed wanted. To be placed at branch points in the guided-path
-navigation (see above) — rewarding curiosity without ever being required
-to understand the core content.
+### 15. CONVERSION / BUSINESS PURPOSE
+- **Objective:** The portfolio must immediately establish Ashish as a high-tier software engineer. The cinematic layer attracts attention, the environmental storytelling creates memory, the portfolio information creates trust, and the CTA creates conversion. These four goals must perfectly coexist.
 
-## Performance & accessibility
-See 15_DEVICE_BEHAVIOR.md for the full performance, desktop/mobile
-mapping, and accessibility spec — not duplicated here to avoid drift.
+---
 
-## Scalability
-Not a current priority for the *world's technical architecture* — build
-the world to be right for the current public project set (GET UNZIP, MS
-Security, Atlas UI, this portfolio itself) rather than over-engineering
-for hypothetical future content. That said, the owner has ideas for 4–6+
-future projects, so the project-presentation pattern (live demo +
-narrative framing, see 18_PROJECT_CONTENT_PLAN.md) should stay easy to
-repeat per-project even though the world itself isn't being built for
-infinite scale right now.
+## THE WORLD EXPERIENCE MAP
+The world is a single continuous architectural environment. Navigation is a guided path with distinct choice points.
+
+**1. ENTRY STATE (The Void)**
+- **LOCATION:** Z = 15
+- **PURPOSE:** Establish mystery and "presence" before the visual reveal.
+- **VISUAL LANGUAGE:** Perceived visual darkness (not a literal black screen). Extremely subtle depth and faint, slow-drifting atmospheric layers confirm the site has loaded.
+
+**2. USER INTERACTION & ATMOSPHERIC REVEAL**
+- **VISUAL LANGUAGE:** Upon first touch, the environment responds with a restrained physical disturbance. The atmosphere settles naturally. A single, focused, optimized light beam cuts through the darkness.
+
+**3. IDENTITY REVEAL (The Discovery)**
+- **LOCATION:** Z = 0
+- **VISUAL LANGUAGE:** The light beam strikes a massive concrete structure. As the camera drifts and the light rotates, shadows cast by extruded concrete blocks lengthen and perfectly align to spell "ASHISH". 
+
+**4. WORLD REVEAL & CONTROL HANDOFF**
+- **VISUAL LANGUAGE:** Tungsten lights hum to life sequentially, revealing the Main Spine. 

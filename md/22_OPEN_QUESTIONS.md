@@ -1,27 +1,15 @@
-# OPEN QUESTIONS — REQUIRE OWNER INPUT
+# OPEN QUESTIONS & REQUIRED APPROVALS
 
-## Resolved this round
-- ~~Family-responsibility story depth~~ — **DECIDED: private, never written
-  or spoken to visitors, tone-only.** See 01_PORTFOLIO_VISION.md.
-- Owner has ideas for **4–6+ future projects**, confirming the
-  project-presentation pattern should stay easy to repeat rather than
-  being treated as a fixed short list.
+Before Phase 6.7 begins, the owner must approve the following architectural decisions:
 
-## Content still pending from the owner
-- Actual details for **GET UNZIP** and **Atlas UI** (what they are, what
-  makes them worth showing)
-- Details for the 4–6+ future project ideas, as they're ready
+**1. Shadow Typographic Reveal**
+*Proposal:* The identity reveal relies on a dynamic spotlight casting shadows from abstract concrete blocks that align to spell "ASHISH". 
+*Requires Approval:* Does this meet the "Wait—that's ASHISH" moment of discovery, or is it too abstract?
 
-## Design decisions deferred to Phase 3 (not urgent yet, listed for
-tracking)
-- ~~Exact accent color(s)~~ — **DECIDED (Phase 3): Tungsten/Amber against Stone grayscale base.**
-- The "extra" symbolic world layer beyond realistic day/night/weather
-- ~~Specific typefaces~~ — **DECIDED (Phase 2): Oswald (Display), Inter (Body), Newsreader (Human/Story).**
-- ~~Final material list~~ — **DECIDED (Phase 3): Pure CSS architectural structure (raw borders, zero noise, interactive lighting) to avoid cheap AI-texture feel.**
-- ~~Exact reduced-motion fallback~~ — **DECIDED (Phase 3): Global CSS switch kills all transitions, JS specifically short-circuits physics loop and lighting tracking.**
+**2. Story / About Branch**
+*Proposal:* The right branch (`Z=-40`) leads to the "Archives", a warmer, wood-paneled space with drafting tables and blueprints containing the textual bio.
+*Requires Approval:* What specific text should exist here?
 
-## Deferred to Phase 4
-- Technology stack — process is locked (17_TECHNOLOGY_DECISIONS.md), no
-  tools chosen yet. Also needs a conversation about the owner's own
-  mobile-only build workflow, since he'll likely be maintaining this
-  himself from a phone.
+**3. Performance Limits vs. Visual "WOW"**
+*Proposal:* We implement custom GLSL shaders for materials and Post-Processing (Bloom) on Desktop to achieve the "premium agency" look, but disable Bloom on Mobile.
+*Requires Approval:* Is the owner okay with Desktop looking significantly more cinematic than Mobile to preserve battery/FPS, or must they be 1:1 identical?

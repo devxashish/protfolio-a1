@@ -5,6 +5,7 @@ import { Lighting } from './lighting.js';
 import { Weather } from './weather.js';
 import { Projects } from './projects.js';
 import { AudioSystem } from './audio.js';
+import { EntrySequence } from './entry.js';
 
 export class App {
   constructor() {
@@ -20,7 +21,6 @@ export class App {
     document.body.prepend(this.container);
 
     this.scene = new THREE.Scene();
-    this.scene.fog = new THREE.FogExp2(0x050505, 0.15); // Start very thick (dark entry)
 
     this.cameraController = new CameraController(this);
     
@@ -45,6 +45,14 @@ export class App {
 
     // Initialize Audio
     this.audio = new AudioSystem();
+
+    // Check reduced motion
+    this.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Initialize Entry Sequence
+    if (!this.prefersReducedMotion) {
+        this.entry = new EntrySequence(this);
+    }
 
     this.bindEvents();
     this.render();
@@ -78,9 +86,6 @@ export class App {
             this.audio.playLightClick();
         }
     });
-    
-    // Check reduced motion
-    this.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
   onWindowResize() {
@@ -95,7 +100,12 @@ export class App {
     const time = this.clock.getElapsedTime();
 
     if (!this.prefersReducedMotion) {
-        this.cameraController.update(delta);
+        if (this.entry && this.entry.isActive) {
+            this.entry.update(delta);
+        } else {
+            this.cameraController.update(delta);
+        }
+        
         this.weather.update(delta, time);
         this.projects.update(delta, this.cameraController.camera);
         
@@ -104,11 +114,6 @@ export class App {
             const camVel = Math.abs(this.cameraController.targetZ - this.cameraController.currentZ);
             this.audio.updateFootsteps(delta, camVel);
             this.audio.update(delta, this.cameraController.currentZ, this.cameraController.isTransitioning);
-        }
-        
-        // Entry Sequence: Fade fog from 0.15 down to 0.02
-        if (this.scene.fog.density > 0.02) {
-            this.scene.fog.density -= 0.05 * delta;
         }
     }
     

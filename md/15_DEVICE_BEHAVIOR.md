@@ -1,38 +1,28 @@
-# DEVICE BEHAVIOR SYSTEM
-*(covers Performance, Accessibility, and Responsive strategy together —
-grouped as one "how the experience adapts to the device" concern)*
+# DEVICE BEHAVIOR & INTERACTION MODEL
 
-## Performance
-Mobile is the floor, not the ceiling — fitting, since the owner himself
-builds entirely from a mobile phone. The experience must never break or
-stutter on an average phone; it should scale UP in fidelity (richer
-physics detail, more elaborate lighting) on devices that can handle it,
-never scale down into breakage.
+Mobile is NOT a reduced desktop version. The experience should feel physical on touch.
 
-## Desktop ↔ mobile interaction mapping
-Same core experience on both, different input methods:
+## CAMERA LANGUAGE & THE ENTRY SEQUENCE
+- **Initial Framing:** Absolute darkness.
+- **Trigger:** On desktop, any mouse click or scroll. On mobile, the first tap or swipe.
+- **Cinematic Movement:** Natural visual timing (approx. 2-4 seconds) while light reveals the Identity shadows.
+- **Skip Behavior:** Immediately jumps the camera to the exact final post-reveal coordinates and snaps all lighting to 100% active. The environment state is absolutely identical to naturally watching the intro.
+- **Look-At Behavior:** "Soft Magnetism" smoothly rotates the camera toward projects when approaching Z bounds.
 
-| Desktop action | Mobile equivalent |
-|---|---|
-| Mouse hover | Tap / long-press reveal |
-| Scroll (wheel) | Scroll (touch drag) |
-| Click-drag (grab/tear) | Touch-drag |
-| Keyboard shortcuts (if any) | On-screen equivalent controls |
+---
 
-Desktop and mobile are not "full version vs. lite version" — they are the
-same world experienced through different hands. Implementation strategy
-can differ (e.g. simplified physics calculation on mobile), but the
-visitor should never feel like they got a lesser experience just because
-they're on a phone.
+## INTERACTION MAPPING (DESKTOP -> MOBILE)
 
-## Accessibility
-A **reduced-motion fallback** is required — for motion-sensitive visitors
-and screen readers. This is not a stripped-down experience; it's an
-equally complete but calmer path through the same content:
-- Physics-driven reveals replaced with simple, immediate state changes
-- Camera-driven depth replaced with straightforward scroll-based layout
-- All content (story, projects, skills, contact) remains fully reachable
-- Respects the OS-level `prefers-reduced-motion` setting as the trigger
+| INTERACTION | DESKTOP BEHAVIOR | MOBILE BEHAVIOR | NOTES |
+| :--- | :--- | :--- | :--- |
+| **Intro Trigger** | Mouse click / Scroll | Screen Tap / Swipe | First input wakes the environment. |
+| **Move Forward/Back** | Mouse Wheel / Trackpad Scroll | Vertical Swipe (Drag up/down) | Maps to Z-axis translation. Heavy friction on mobile. |
+| **Look Around** | Mouse Click & Drag (Horizontal) | Horizontal Swipe (Left/Right) | Deadzone prevents accidental rotation during vertical walking. |
+| **Micro-Parallax** | Mouse Move | Unmapped (Static) | Gyroscope requires permissions and is often janky. Disabled by default. |
+| **Artifact Focus** | Click / Pointer | Tap | Triggers the spring-physics camera zoom. |
+| **Contact Action** | Standard Click on Terminal | Standard Tap on Terminal | Completely effortless conversion. No physics puzzles to contact the owner. |
 
-Exact implementation is a Phase 3/4 decision once the primary motion
-system is finalized — but the requirement itself is locked.
+## ACCESSIBILITY & FALLBACK
+- **Reduced Motion:** If `(prefers-reduced-motion: reduce)` is detected, the entire 3D world is disabled. The site gracefully falls back to the high-polish 2D DOM portfolio implemented in Phase 5.
+- **WebGL Failure:** Identical fallback to the 2D DOM portfolio.
+- **Performance:** Excessive effects (bloom, intense particles, camera shake) are explicitly banned to guarantee flawless mobile rendering and battery preservation.

@@ -1,33 +1,25 @@
-# TECHNOLOGY DECISIONS
+# TECHNOLOGY DECISIONS (POST-ARCHITECTURE RE-EVALUATION)
 
-## Status: DEFERRED — Phase 4
+After mapping the spatial and interactive experience, the technology stack must be strictly evaluated. Do NOT add technologies just because they are impressive.
 
-No technology has been chosen. This document exists to lock the *process*
-by which technology will be chosen, so no tool gets picked just because
-it's popular or "expected" for this kind of site.
+## REQUIREMENTS EVALUATION
 
-## Decision process (mandatory for every major technical choice)
-For each system (world rendering, physics, camera, motion, sound):
+**1. Do we need Three.js?**
+*Decision: YES.* The requirement for physical lighting, spring-physics camera, and 3D artifacts (glass stacks, robotic arms) cannot be achieved via CSS 3D transforms.
 
-1. **Experience requirement** — what the visitor needs to feel/do
-2. **Technical requirement** — what that implies technically
-3. **Possible solutions** — candidate technologies
-4. **Comparison** — trade-offs (performance, mobile behavior, complexity,
-   maintainability given the owner currently builds from mobile only)
-5. **Final decision** — with reasoning recorded in 21_DECISIONS.md
+**2. Do we need custom GLSL shaders?**
+*Decision: YES (for Materials).* External textures are banned (to keep the repo size near 0 and maintain the single-file mindset). Procedural canvas textures look like "AI slop". To achieve raw, believable concrete and machined metal, we MUST use custom fragment shaders with GPU-calculated Perlin noise and physical lighting overrides.
 
-## Explicitly rejected reasoning patterns
-- "Use React because it's popular"
-- "Use Three.js because it's a 3D portfolio"
-- "Use Framer Motion because we need animation"
+**3. Do we need a physics engine (Cannon.js/Ammo)?**
+*Decision: NO.* The interactions defined (Grab/Focus, Heavy Scroll Door) require *physics-based animation* (springs, inertia, friction), NOT full rigid-body collision simulation. A lightweight custom spring dampener in Vanilla JS is sufficient and vastly cheaper on performance.
 
-None of these are valid justifications on their own. A technology is only
-selected once the experience requirement it serves is documented.
+**4. Do we need GSAP/Framer Motion?**
+*Decision: NO.* Vanilla JS `requestAnimationFrame` with exponential decay (`current += (target - current) * friction`) creates the exact heavy, tactile feel required without the 80kb overhead.
 
-## Known constraint that affects this phase
-The owner builds and will likely continue building/maintaining this site
-from a mobile device, with no laptop/PC currently available. This is a
-real technical constraint that Phase 4 must weigh — not just runtime
-performance for visitors, but authorability and maintainability for the
-owner himself. This should be raised explicitly with the owner before any
-stack is proposed.
+**5. Do we need Post-Processing (EffectComposer)?**
+*Decision: YES, but conditional.* The "WOW" factor requires bloom on the tungsten lights and emissive screens, and potentially subtle depth of field. This will be implemented, but strictly disabled on mobile devices to protect battery and thermal limits.
+
+## PERFORMANCE RISKS
+1. **Custom Shaders:** High-frequency procedural noise in fragment shaders can kill mobile GPUs. Must optimize the noise functions.
+2. **Post-Processing:** Bloom requires multiple render passes. Destroys fill-rate on low-end phones.
+3. **Geometry Complexity:** Artifact models (e.g., robotic arm, desk) must be procedurally generated via code. High segment counts will explode vertices. Must use low-poly with smooth shading.

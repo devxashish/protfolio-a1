@@ -6,28 +6,62 @@ export class Projects {
     this.artifacts = [];
     
     const projectData = [
-      { id: 'ms-security', name: 'MS Security', url: 'https://drive.google.com/file/d/1tf8zqLWN0mHaaUF2fFbYuzI1CDOv3uSf/view?usp=drive_link', z: -36, type: 'phone', color: 0x2244aa },
-      { id: 'get-unzip', name: 'GET UNZIP', url: 'https://unzip-web.netlify.app', z: -48, type: 'monitor', color: 0xaa4422 },
-      { id: 'atlas-ui', name: 'Atlas UI', url: 'https://atlas-ui-three.vercel.app', z: -60, type: 'stack', color: 0x22aa44 },
-      { id: 'portfolio', name: 'This Portfolio', url: 'https://github.com/devxashish/protfolio-a1', z: -72, type: 'blueprint', color: 0x888888 }
+      { 
+        id: 'ms-security', 
+        name: 'MS Security', 
+        url: 'https://drive.google.com/file/d/1tf8zqLWN0mHaaUF2fFbYuzI1CDOv3uSf/view?usp=drive_link', 
+        z: -12, 
+        type: 'phone', 
+        color: 0x2244aa,
+        info: {
+            what: "High-security mobile environment for restricted data.",
+            built: "End-to-end encrypted local storage & secure comms.",
+            role: "Lead Mobile Architect / C++ / Java",
+            capability: "Zero-knowledge architecture implementation."
+        }
+      },
+      { 
+        id: 'get-unzip', 
+        name: 'GET UNZIP', 
+        url: 'https://unzip-web.netlify.app', 
+        z: -24, 
+        type: 'monitor', 
+        color: 0xaa4422,
+        info: {
+            what: "Desktop-class web application for archive extraction.",
+            built: "WASM-powered high-speed decompression engine.",
+            role: "Fullstack Engineer / React / Rust",
+            capability: "Client-side processing bypassing server limits."
+        }
+      },
+      { 
+        id: 'atlas-ui', 
+        name: 'Atlas UI', 
+        url: 'https://atlas-ui-three.vercel.app', 
+        z: -36, 
+        type: 'stack', 
+        color: 0x22aa44,
+        info: {
+            what: "A comprehensive enterprise design system.",
+            built: "30+ complex accessible React components.",
+            role: "Frontend Engineer / TypeScript / CSS",
+            capability: "Flawless accessibility and keyboard navigation."
+        }
+      }
     ];
 
     projectData.forEach((p, i) => {
         const artifact = this.createArtifact(p);
         
-        const xOffset = i % 2 === 0 ? -3 : 3;
-        artifact.position.set(xOffset, 1.5, p.z);
+        artifact.position.set(-16, 1.5, p.z + 6);
+        artifact.rotation.y = Math.PI / 2;
         
-        // Orient towards center
-        artifact.lookAt(0, 1.5, p.z);
-        
-        artifact.userData = { url: p.url, originalY: 1.5, name: p.name, isProject: true };
+        artifact.userData = { ...p, originalY: 1.5, isProject: true };
         this.scene.add(artifact);
         this.artifacts.push(artifact);
         
-        // Add Signage
         const sign = this.createSignage(p.name);
-        sign.position.set(0, 2, 0); // Relative to artifact
+        sign.position.set(0, 2.5, 0); 
         artifact.add(sign);
     });
 
@@ -41,7 +75,6 @@ export class Projects {
     const deskMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
     
     if (data.type === 'phone') {
-        // Phone on a pedestal
         geo = new THREE.BoxGeometry(0.8, 1.6, 0.1); 
         const mesh = new THREE.Mesh(geo, mat);
         mesh.position.y = 1.2;
@@ -54,7 +87,6 @@ export class Projects {
         group.add(pedestal);
         group.userData.hitMesh = mesh;
     } else if (data.type === 'monitor') {
-        // Monitor on a heavy workstation desk
         geo = new THREE.BoxGeometry(2.5, 1.5, 0.1); 
         const mesh = new THREE.Mesh(geo, mat);
         mesh.position.y = 1.6;
@@ -72,7 +104,6 @@ export class Projects {
         group.add(desk);
         group.userData.hitMesh = mesh;
     } else if (data.type === 'stack') {
-        // 3 floating planes (cinematic display), tethered by wires/base
         const base = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.2, 1.5), deskMat);
         base.position.y = 0.1;
         group.add(base);
@@ -87,29 +118,10 @@ export class Projects {
         }
         group.add(meshGroup);
         group.userData.hitMesh = meshGroup;
-    } else {
-        // blueprint table
-        geo = new THREE.BoxGeometry(2.5, 0.1, 1.5);
-        const table = new THREE.Mesh(geo, deskMat);
-        table.position.y = 1;
-        table.rotation.x = Math.PI / 6;
-        table.castShadow = true;
-        group.add(table);
-        
-        const blueprint = new THREE.Mesh(new THREE.PlaneGeometry(2.3, 1.3), new THREE.MeshStandardMaterial({ color: 0x223344, emissive: 0x112233 }));
-        blueprint.rotation.x = -Math.PI / 2;
-        blueprint.position.set(0, 0.06, 0);
-        table.add(blueprint);
-        
-        const legs = new THREE.Mesh(new THREE.BoxGeometry(2, 1, 1), deskMat);
-        legs.position.y = 0.5;
-        group.add(legs);
-        group.userData.hitMesh = table;
-    }
+    } 
     
-    // Transparent hitbox for raycasting encompassing the whole structure
     const hitBox = new THREE.Mesh(
-        new THREE.BoxGeometry(3, 3, 3), 
+        new THREE.BoxGeometry(4, 4, 4), 
         new THREE.MeshBasicMaterial({visible: false})
     );
     hitBox.position.y = 1.5;
@@ -125,11 +137,9 @@ export class Projects {
     canvas.height = 256;
     const ctx = canvas.getContext('2d');
     
-    // Sleek physical glass/plastic signage look
     ctx.fillStyle = 'rgba(10, 10, 10, 0.9)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Subtle border
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
     ctx.lineWidth = 4;
     ctx.strokeRect(2, 2, canvas.width-4, canvas.height-4);
@@ -146,7 +156,6 @@ export class Projects {
     texture.minFilter = THREE.LinearMipmapLinearFilter;
     texture.magFilter = THREE.LinearFilter;
     
-    // Instead of a sprite which always faces camera, make it a physical board attached to the artifact
     const geo = new THREE.PlaneGeometry(2.5, 0.6);
     const material = new THREE.MeshStandardMaterial({ 
         map: texture, 
@@ -155,7 +164,6 @@ export class Projects {
         emissive: 0x111111 
     });
     const mesh = new THREE.Mesh(geo, material);
-    
     return mesh;
   }
 
@@ -167,7 +175,6 @@ export class Projects {
         if (!e.touches) {
             this.pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
             this.pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
-            // Handle hover
             window.dispatchEvent(new CustomEvent('projectHover', { detail: this.pointer }));
         }
     };
@@ -187,11 +194,10 @@ export class Projects {
 
   getHoveredArtifact(camera) {
     this.raycaster.setFromCamera(this.pointer, camera);
-    // Intersect the hitboxes (children of artifacts)
     const hitBoxes = this.artifacts.map(a => a.userData.hitBox);
     const intersects = this.raycaster.intersectObjects(hitBoxes);
     if (intersects.length > 0) {
-        return intersects[0].object.parent; // Return the group
+        return intersects[0].object.parent; 
     }
     return null;
   }
@@ -199,23 +205,136 @@ export class Projects {
   checkIntersections(camera, app) {
     const artifact = this.getHoveredArtifact(camera);
     if (artifact) {
-        // Cinematic Transition
-        app.cameraController.transitionTo(artifact.position, artifact.userData.url);
+        if (app.cameraController.isFocused) return;
+        
+        // 1. Enter Focus Mode
+        const focusPos = new THREE.Vector3(-12, 1.5, artifact.position.z);
+        const focusRot = new THREE.Vector2(0, Math.PI / 2);
+        app.cameraController.focusOn(focusPos, focusRot);
+        
+        // 2. Show UI
+        this.showProjectInfo(artifact.userData, app);
     }
+  }
+
+  showProjectInfo(data, app) {
+    const overlay = document.createElement('div');
+    overlay.id = 'project-focus-overlay';
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.right = '0';
+    overlay.style.width = '100%';
+    overlay.style.maxWidth = '400px';
+    overlay.style.height = '100%';
+    overlay.style.background = 'linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(10,10,10,0.95) 20%, rgba(10,10,10,1) 100%)';
+    overlay.style.color = '#fff';
+    overlay.style.fontFamily = 'sans-serif';
+    overlay.style.padding = '40px';
+    overlay.style.boxSizing = 'border-box';
+    overlay.style.display = 'flex';
+    overlay.style.flexDirection = 'column';
+    overlay.style.justifyContent = 'center';
+    overlay.style.zIndex = '9000';
+    overlay.style.opacity = '0';
+    overlay.style.transform = 'translateX(20px)';
+    overlay.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+
+    const title = document.createElement('h2');
+    title.textContent = data.name;
+    title.style.margin = '0 0 30px 0';
+    title.style.fontSize = '32px';
+    title.style.letterSpacing = '2px';
+    title.style.borderBottom = '1px solid #333';
+    title.style.paddingBottom = '20px';
+
+    const buildSection = (label, text) => {
+        const wrapper = document.createElement('div');
+        wrapper.style.marginBottom = '20px';
+        const h3 = document.createElement('h3');
+        h3.textContent = label;
+        h3.style.fontSize = '10px';
+        h3.style.color = '#888';
+        h3.style.letterSpacing = '1px';
+        h3.style.textTransform = 'uppercase';
+        h3.style.margin = '0 0 5px 0';
+        const p = document.createElement('p');
+        p.textContent = text;
+        p.style.fontSize = '14px';
+        p.style.lineHeight = '1.6';
+        p.style.margin = '0';
+        p.style.color = '#ddd';
+        wrapper.appendChild(h3);
+        wrapper.appendChild(p);
+        return wrapper;
+    };
+
+    overlay.appendChild(title);
+    overlay.appendChild(buildSection("What It Is", data.info.what));
+    overlay.appendChild(buildSection("What I Built", data.info.built));
+    overlay.appendChild(buildSection("Technology / Role", data.info.role));
+    overlay.appendChild(buildSection("Key Capability", data.info.capability));
+
+    const btnWrapper = document.createElement('div');
+    btnWrapper.style.marginTop = '40px';
+    btnWrapper.style.display = 'flex';
+    btnWrapper.style.gap = '20px';
+
+    const launchBtn = document.createElement('a');
+    launchBtn.textContent = 'LAUNCH DEMO';
+    launchBtn.href = data.url;
+    launchBtn.target = '_blank';
+    launchBtn.style.padding = '10px 20px';
+    launchBtn.style.background = '#fff';
+    launchBtn.style.color = '#000';
+    launchBtn.style.textDecoration = 'none';
+    launchBtn.style.fontWeight = 'bold';
+    launchBtn.style.fontSize = '12px';
+    launchBtn.style.letterSpacing = '1px';
+    launchBtn.style.borderRadius = '2px';
+
+    const backBtn = document.createElement('button');
+    backBtn.textContent = 'BACK TO SPINE';
+    backBtn.style.padding = '10px 20px';
+    backBtn.style.background = 'transparent';
+    backBtn.style.color = '#888';
+    backBtn.style.border = '1px solid #333';
+    backBtn.style.cursor = 'pointer';
+    backBtn.style.fontWeight = 'bold';
+    backBtn.style.fontSize = '12px';
+    backBtn.style.letterSpacing = '1px';
+    
+    backBtn.onmouseover = () => { backBtn.style.color = '#fff'; backBtn.style.borderColor = '#888'; };
+    backBtn.onmouseout = () => { backBtn.style.color = '#888'; backBtn.style.borderColor = '#333'; };
+
+    backBtn.onclick = () => {
+        overlay.style.opacity = '0';
+        overlay.style.transform = 'translateX(20px)';
+        setTimeout(() => overlay.remove(), 500);
+        app.cameraController.exitFocus();
+    };
+
+    btnWrapper.appendChild(launchBtn);
+    btnWrapper.appendChild(backBtn);
+    overlay.appendChild(btnWrapper);
+    
+    document.body.appendChild(overlay);
+
+    // Trigger reflow for animation
+    void overlay.offsetWidth;
+    overlay.style.opacity = '1';
+    overlay.style.transform = 'translateX(0)';
   }
 
   update(delta, camera) {
     const time = Date.now() * 0.001;
-    
-    // Hover logic
     const hovered = this.getHoveredArtifact(camera);
 
     this.artifacts.forEach((group, i) => {
-        // Idle animation
+        // Idle hover animation
         group.position.y = group.userData.originalY + Math.sin(time + i) * 0.1;
         
         // Highlight if hovered
-        const scaleTarget = (group === hovered) ? 1.2 : 1.0;
+        const scaleTarget = (group === hovered) ? 1.05 : 1.0;
         group.scale.lerp(new THREE.Vector3(scaleTarget, scaleTarget, scaleTarget), delta * 10);
     });
   }
