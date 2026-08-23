@@ -14,12 +14,11 @@
 
 ## Design decisions deferred to Phase 3 (not urgent yet, listed for
 tracking)
-- Exact accent color(s) and harmony type (color-theory selection against
-  finalized materials/lighting)
+- ~~Exact accent color(s)~~ — **DECIDED (Phase 3): Tungsten/Amber against Stone grayscale base.**
 - The "extra" symbolic world layer beyond realistic day/night/weather
-- Specific typefaces (from the "mix of 2–3" direction)
-- Final material list beyond the proposed wood/stone/metal
-- Exact reduced-motion fallback behavior for each major interaction
+- ~~Specific typefaces~~ — **DECIDED (Phase 2): Oswald (Display), Inter (Body), Newsreader (Human/Story).**
+- ~~Final material list~~ — **DECIDED (Phase 3): Pure CSS architectural structure (raw borders, zero noise, interactive lighting) to avoid cheap AI-texture feel.**
+- ~~Exact reduced-motion fallback~~ — **DECIDED (Phase 3): Global CSS switch kills all transitions, JS specifically short-circuits physics loop and lighting tracking.**
 
 ## Deferred to Phase 4
 - Technology stack — process is locked (17_TECHNOLOGY_DECISIONS.md), no

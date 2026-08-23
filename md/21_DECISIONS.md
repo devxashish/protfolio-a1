@@ -26,6 +26,11 @@
 | Technology stack | Not yet chosen — process locked (see 17_TECHNOLOGY_DECISIONS.md) | — | **YES — Phase 4** |
 | Foundation Tech Stack | Plain HTML/CSS/Vanilla JS (No build step) | Fits mobile-only authoring constraint perfectly, avoids bundler container errors, maximizes maintainability. | No — established for Phase 1 |
 
+| Phase 3 Color System | Base: Concrete/Stone (Grayscale), Accent: Tungsten/Amber (#b45309 day, #d97706 night) | Directly matches raw materials and real "light-on" room behavior. Avoids generic "tech orange" by keeping it muted and deeply integrated with shadows. | No — established |
+| Phase 3 Materials | Pure CSS physical shapes, Stark borders, No textures | Decided against SVG noise filters as they risk feeling cheap/AI-generated. Selected stark, architectural borders and realistic cast shadows for weight. | No — established |
+| Phase 3 Interactions | 1D Spring Grab/Drag on Projects, Intersection Light-on reveal | Fully vanilla JS pointer-events for physics. Lightweight, mobile-compatible, accessible via focus. | No — established |
+| Phase 3 Accessibility | Semantic focus-visible, main.js focus-shifting | Solves screen-reader internal navigation gaps while maintaining the aesthetic without outline-soup. | No — established |
+
 *(A single status column isn't used here since this is a living document
 updated in place — every row above reflects the current state as of this
 session.)*

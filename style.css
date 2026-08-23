@@ -1,15 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,wght@0,400;0,500;1,400&family=Oswald:wght@500;700&display=swap');
 
 :root {
-  /* Day Mode (Default) */
-  --bg-primary: #f2f2f0;
-  --bg-secondary: #e6e6e4;
-  --text-primary: #121212;
-  --text-secondary: #595959;
+  /* Day Mode: Concrete & Raw Stone */
+  --bg-primary: #e8e8e8;
+  --bg-secondary: #dcdcdc;
+  --text-primary: #111111;
+  --text-secondary: #4a4a4a;
   
-  /* Semantic Accent - Structural Rust/Amber */
-  --accent-interactive: #c2410c; 
-  --accent-muted: #fdba74;
+  /* Semantic Accent: Tungsten / Amber (Confirmed Phase 3) */
+  --accent-interactive: #b45309; 
+  --accent-muted: #78350f;
+
+  /* Material properties */
+  --surface-border: #cccccc;
+  --surface-shadow: rgba(0, 0, 0, 0.1);
+  --light-ambient: rgba(255, 255, 255, 0.8);
 
   /* Typography */
   --font-display: 'Oswald', sans-serif;
@@ -26,18 +31,27 @@
   /* Grid */
   --container-width: 1400px;
   --grid-gap: 2rem;
+
+  /* Pointer tracking defaults */
+  --mouse-x: 50vw;
+  --mouse-y: 50vh;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-primary: #0a0a0a;
-    --bg-secondary: #141414;
-    --text-primary: #f2f2f2;
-    --text-secondary: #888888;
+    /* Night Mode: Slate & Weathered Metal */
+    --bg-primary: #0a0b0c;
+    --bg-secondary: #121416;
+    --text-primary: #f0f0f0;
+    --text-secondary: #8c9398;
     
-    /* Semantic Accent glows slightly more at night */
-    --accent-interactive: #f97316;
-    --accent-muted: #9a3412;
+    /* Semantic Accent: Glowing Tungsten */
+    --accent-interactive: #d97706;
+    --accent-muted: #92400e;
+
+    --surface-border: #22262a;
+    --surface-shadow: rgba(0, 0, 0, 0.8);
+    --light-ambient: rgba(217, 119, 6, 0.05); /* Very subtle ambient glow */
   }
 }
 
@@ -55,7 +69,13 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* Base Accessibility: Focus States */
+*:focus-visible {
+  outline: 2px solid var(--accent-interactive);
+  outline-offset: 4px;
 }
 
 /* Typography Hierarchy */
@@ -71,6 +91,9 @@ h1, h2, h3, h4, h5, h6 {
   font-size: clamp(3.5rem, 8vw, 10rem);
   margin-bottom: var(--space-md);
   max-width: 14ch;
+  position: relative;
+  /* Lighting response: text casts subtle shadow away from mouse */
+  text-shadow: calc((50vw - var(--mouse-x)) * 0.01) calc((50vh - var(--mouse-y)) * 0.01) 10px var(--surface-shadow);
 }
 
 .headline-section {
@@ -79,6 +102,15 @@ h1, h2, h3, h4, h5, h6 {
   border-bottom: 2px solid var(--text-primary);
   padding-bottom: var(--space-sm);
   display: inline-block;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+/* Light-on reveal state */
+.is-revealed .headline-section {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .text-human {
@@ -121,7 +153,12 @@ section {
   align-items: center;
   z-index: 100;
   mix-blend-mode: difference;
-  color: #fff; /* Enforce white for difference blend */
+  color: #fff;
+  pointer-events: none;
+}
+
+.global-header a {
+  pointer-events: auto;
 }
 
 .nav-links {
@@ -136,6 +173,7 @@ section {
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  transition: color 0.2s ease;
 }
 
 .nav-links a:hover {
@@ -148,6 +186,8 @@ section {
   display: flex;
   align-items: flex-end;
   padding-bottom: var(--space-xl);
+  /* The room ambient lighting based on mouse */
+  background: radial-gradient(circle at var(--mouse-x) var(--mouse-y), var(--light-ambient) 0%, transparent 60%);
 }
 
 .hero-grid {
@@ -168,24 +208,51 @@ section {
   gap: var(--space-lg);
 }
 
-/* Projects Section */
+/* Projects Section (Tactile Physics) */
 .project-list {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
+  perspective: 1000px;
 }
 
 .project-item {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--space-md);
-  border-top: 1px solid var(--text-secondary);
+  border-top: 1px solid var(--surface-border);
   padding-top: var(--space-md);
-  transition: border-color 0.3s ease;
+  background-color: var(--bg-primary);
+  
+  /* Physical properties for tactile interaction */
+  cursor: grab;
+  touch-action: pan-y; /* Allow vertical scroll, hijack horizontal for drag */
+  user-select: none;
+  position: relative;
+  will-change: transform;
 }
 
-.project-item:hover {
-  border-top-color: var(--text-primary);
+.project-item:active {
+  cursor: grabbing;
+}
+
+.project-item::before {
+  /* Reveal layer underneath */
+  content: "RELEASE TO EXPLORE";
+  position: absolute;
+  top: var(--space-md);
+  left: var(--space-md);
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--accent-interactive);
+  opacity: 0;
+  z-index: -1;
+  transform: translateX(-20px);
+  transition: opacity 0.2s ease;
+}
+
+.project-item.is-dragging::before {
+  opacity: 1;
 }
 
 .project-title {
@@ -196,6 +263,7 @@ section {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
+  pointer-events: none;
 }
 
 .project-demo-btn {
@@ -208,6 +276,7 @@ section {
   text-transform: uppercase;
   align-self: flex-start;
   transition: all 0.2s ease;
+  pointer-events: auto; /* Buttons inside draggable area must be clickable */
 }
 
 .project-demo-btn:hover {
@@ -223,17 +292,18 @@ section {
 }
 
 .skill-tag {
-  border: 1px solid var(--text-secondary);
+  border: 1px solid var(--surface-border);
   padding: 0.5rem 1rem;
   font-family: var(--font-body);
   font-size: 0.875rem;
   color: var(--text-secondary);
+  background: var(--bg-secondary);
 }
 
 /* Footer / Contact */
 .footer {
   padding: var(--space-xl) 0 var(--space-md) 0;
-  border-top: 2px solid var(--text-primary);
+  border-top: 2px solid var(--surface-border);
 }
 
 .contact-grid {
@@ -306,5 +376,18 @@ section {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  
+  .headline-massive {
+    text-shadow: none;
+  }
+  
+  .hero {
+    background: none;
+  }
+
+  .project-item {
+    transform: none !important;
+    cursor: default;
   }
 }
