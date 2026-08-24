@@ -10,132 +10,77 @@ export class EntrySequence {
         
         this.isActive = true;
         this.isRevealing = false;
-        this.elapsed = 0;
-        this.totalDuration = 4.0;
+        this.sandFalling = false;
         
-        // Save original lighting values
-        this.origAmbient = this.lighting.ambientLight.intensity;
-        this.origDir = this.lighting.directionalLight.intensity;
-        this.origExt = this.lighting.exteriorLight.intensity;
+        this.elapsedReveal = 0;
+        this.totalRevealDuration = 3.0; // architectural reveal time
         
-        this.setupEnvironment();
-        this.setupShadowRig();
-        this.setupDust();
+        this.elapsedSand = 0;
+        this.totalSandDuration = 4.0; // how long sand falls before reveal
+        
+        this.mouseX = 0;
+        this.mouseY = 0;
+        
+        this.setupDarkness();
+        this.setupSand();
         this.setupUI();
         this.lockControls();
     }
 
-    setupEnvironment() {
-        // Initial darkness (perceived, not literal black)
-        this.scene.fog = new THREE.FogExp2(0x020202, 0.12);
-        this.scene.background = new THREE.Color(0x020202);
+    setupDarkness() {
+        this.scene.fog = new THREE.FogExp2(0x000000, 0.15); // extreme fog
         
-        // Turn off all main lights initially for the dark void effect
-        this.lighting.ambientLight.intensity = 0;
+        this.origAmbient = this.lighting.ambientLight.intensity;
+        this.origDir = this.lighting.directionalLight.intensity;
+        this.origExt = this.lighting.exteriorLight.intensity;
+        
+        this.lighting.ambientLight.intensity = 0.01;
         this.lighting.directionalLight.intensity = 0;
         this.lighting.exteriorLight.intensity = 0;
         
-        // Force tungstens to 0 immediately so they don't fade in if camera is near
-        this.lighting.tungstens.forEach(t => t.light.intensity = 0);
-    }
-
-    setupShadowRig() {
-        // Spotlight for the reveal
-        this.spotlight = new THREE.SpotLight(0xffffff, 0);
-        this.spotlight.position.set(-8, 8, 8); // Start wide and low
-        this.spotlight.angle = Math.PI / 4;
-        this.spotlight.penumbra = 0.5;
-        this.spotlight.decay = 2;
-        this.spotlight.distance = 50;
+        this.spotlight = new THREE.SpotLight(0xffffff, 0, 100, Math.PI / 6, 0.5, 1.0);
+        this.spotlight.position.set(-10, 2, 8); 
+        this.spotlight.target.position.set(0, 4, 0);
         this.spotlight.castShadow = true;
-        this.spotlight.shadow.mapSize.width = 1024;
-        this.spotlight.shadow.mapSize.height = 1024;
-        this.spotlight.shadow.camera.near = 1;
-        this.spotlight.shadow.camera.far = 20;
-        
-        this.target = new THREE.Object3D();
-        this.target.position.set(0, 0, 0);
-        this.scene.add(this.target);
-        this.spotlight.target = this.target;
-        
+        this.spotlight.shadow.mapSize.width = 2048;
+        this.spotlight.shadow.mapSize.height = 2048;
         this.scene.add(this.spotlight);
-
-        // The "ASHISH" Shadow Mask
-        const canvas = document.createElement('canvas');
-        canvas.width = 1024;
-        canvas.height = 256;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = 'black'; // Alpha 0 in alphaMap
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = 'white'; // Alpha 1 in alphaMap
-        ctx.font = 'bold 160px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.letterSpacing = '10px';
-        ctx.fillText('ASHISH', canvas.width / 2, canvas.height / 2);
-
-        const alphaMap = new THREE.CanvasTexture(canvas);
-        alphaMap.anisotropy = 4;
-
-        const maskGeo = new THREE.PlaneGeometry(8, 2);
-        const maskMat = new THREE.MeshStandardMaterial({
-            alphaMap: alphaMap,
-            alphaTest: 0.5,
-            colorWrite: false, // Do not render to screen
-            depthWrite: true   // Render to shadow map
-        });
-
-        this.shadowMask = new THREE.Mesh(maskGeo, maskMat);
-        // Position it just above the floor, embedded in the Z=0 pillar
-        this.shadowMask.position.set(0, 2, 1);
-        this.shadowMask.rotation.x = -0.2; // Slight tilt
-        this.shadowMask.castShadow = true;
-        this.scene.add(this.shadowMask);
-        
-        // Disable shadow casting on the abstract core geometry to let the mask cleanly cast the word
-        this.scene.traverse((child) => {
-            if (child.isMesh && child.position.z === 0 && child.position.y > 0) {
-                if (child !== this.shadowMask) {
-                    child.castShadow = false;
-                }
-            }
-        });
+        this.scene.add(this.spotlight.target);
     }
 
-    setupDust() {
-        // Very lightweight particle system
-        const particleCount = 200;
+    setupSand() {
+        const particleCount = 10000;
         const geo = new THREE.BufferGeometry();
         const positions = new Float32Array(particleCount * 3);
         const velocities = [];
-
+        
+        // Spawn sand high above the camera at Z=13 to 16
         for (let i = 0; i < particleCount; i++) {
-            positions[i * 3] = (Math.random() - 0.5) * 20;
-            positions[i * 3 + 1] = Math.random() * 10;
-            positions[i * 3 + 2] = (Math.random() - 0.5) * 20 + 5;
+            positions[i * 3] = (Math.random() - 0.5) * 10;          // X
+            positions[i * 3 + 1] = 5 + (Math.random() * 25);        // Y (High up)
+            positions[i * 3 + 2] = 12 + (Math.random() * 5);        // Z
             velocities.push({
-                x: (Math.random() - 0.5) * 0.05,
-                y: (Math.random() - 0.5) * 0.05,
-                z: (Math.random() - 0.5) * 0.05
+                x: 0,
+                y: -(1.5 + Math.random() * 2), // falling speed
+                z: 0
             });
         }
         geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
         
         const mat = new THREE.PointsMaterial({
-            color: 0x888888,
-            size: 0.05,
+            color: 0xaa8866, // sand color
+            size: 0.03,
             transparent: true,
-            opacity: 0.3,
+            opacity: 0.6,
             depthWrite: false
         });
 
-        this.dust = new THREE.Points(geo, mat);
-        this.dustVelocities = velocities;
-        this.scene.add(this.dust);
+        this.sand = new THREE.Points(geo, mat);
+        this.sandVelocities = velocities;
+        this.scene.add(this.sand);
     }
 
     setupUI() {
-        // Overlay to catch first interaction
         this.overlay = document.createElement('div');
         this.overlay.style.position = 'fixed';
         this.overlay.style.top = '0';
@@ -158,7 +103,6 @@ export class EntrySequence {
         tapPrompt.style.animation = 'pulse 2s infinite';
         this.overlay.appendChild(tapPrompt);
         
-        // Add pulse animation
         if (!document.getElementById('pulse-anim')) {
             const style = document.createElement('style');
             style.id = 'pulse-anim';
@@ -172,7 +116,6 @@ export class EntrySequence {
             document.head.appendChild(style);
         }
 
-        // Subtitle (hidden initially)
         this.subtitle = document.createElement('div');
         this.subtitle.textContent = "SOFTWARE ENGINEER";
         this.subtitle.style.position = 'fixed';
@@ -189,7 +132,6 @@ export class EntrySequence {
         this.subtitle.style.pointerEvents = 'none';
         document.body.appendChild(this.subtitle);
 
-        // Elegant Skip
         this.skipBtn = document.createElement('div');
         this.skipBtn.textContent = "SKIP";
         this.skipBtn.style.position = 'fixed';
@@ -206,13 +148,23 @@ export class EntrySequence {
         this.skipBtn.onmouseout = () => this.skipBtn.style.color = 'rgba(255,255,255,0.3)';
         document.body.appendChild(this.skipBtn);
 
-        // Bind events
         const trigger = (e) => {
-            if (!this.isRevealing) {
+            if (!this.sandFalling && !this.isRevealing) {
                 if (e.target === this.skipBtn) return;
-                this.startReveal();
+                this.startSand();
             }
         };
+
+        const updateMouse = (e) => {
+            // Normalized device coordinates (-1 to +1)
+            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            this.mouseX = (clientX / window.innerWidth) * 2 - 1;
+            this.mouseY = -(clientY / window.innerHeight) * 2 + 1;
+        };
+
+        document.addEventListener('mousemove', updateMouse);
+        document.addEventListener('touchmove', updateMouse, {passive: true});
 
         this.overlay.addEventListener('click', trigger);
         this.overlay.addEventListener('touchstart', trigger);
@@ -231,112 +183,139 @@ export class EntrySequence {
         this.camera.position.y = 1.7;
     }
 
-    startReveal() {
-        this.isRevealing = true;
+    startSand() {
+        this.sandFalling = true;
         this.overlay.style.display = 'none';
         
-        // Physical disturbance: dust swirls briefly
-        this.dustVelocities.forEach(v => {
-            v.x += (Math.random() - 0.5) * 0.5;
-            v.y += (Math.random() - 0.5) * 0.5;
-            v.z += (Math.random() - 0.5) * 0.5;
-        });
-        
-        // Play subtle rumble
         if (this.app.audio && this.app.audio.enabled) {
-            // Future audio integration point
+            // Audio integration
         }
     }
 
+    startReveal() {
+        this.sandFalling = false;
+        this.isRevealing = true;
+    }
+
     skip() {
-        this.elapsed = this.totalDuration;
+        this.elapsedReveal = this.totalRevealDuration;
         this.completeSequence();
     }
 
     completeSequence() {
         this.isActive = false;
         this.isRevealing = false;
+        this.sandFalling = false;
         
-        // Cleanup UI
         if (this.overlay && this.overlay.parentNode) this.overlay.remove();
         if (this.skipBtn && this.skipBtn.parentNode) this.skipBtn.remove();
+        if (this.sand) this.scene.remove(this.sand); // Remove sand to save memory
         this.subtitle.style.opacity = '1';
         
-        // Snap to final state
         this.scene.fog.density = 0.02;
         this.spotlight.intensity = 150;
-        this.spotlight.position.set(0, 8, 4); // Final light position
+        this.spotlight.position.set(0, 8, 4); 
         
-        // Unlock camera exactly at Z=15, Y=1.5
         this.camera.position.z = 15;
         this.camera.position.y = 1.5;
         this.cameraController.currentZ = 15;
         this.cameraController.targetZ = 15;
         this.cameraController.enabled = true;
         
-        // Restore standard world lights
         this.lighting.ambientLight.intensity = this.origAmbient;
         this.lighting.directionalLight.intensity = this.origDir;
         this.lighting.exteriorLight.intensity = this.origExt;
-        
-        // Tungsten lights will naturally trigger via lighting.update() since distance is now active
     }
 
     update(delta) {
         if (!this.isActive) return;
 
-        // Dust ambient movement
-        const positions = this.dust.geometry.attributes.position.array;
-        for (let i = 0; i < positions.length / 3; i++) {
-            positions[i * 3] += this.dustVelocities[i].x * delta;
-            positions[i * 3 + 1] += this.dustVelocities[i].y * delta;
-            positions[i * 3 + 2] += this.dustVelocities[i].z * delta;
+        // Sand Physics
+        if (this.sandFalling || this.isRevealing) {
+            const positions = this.sand.geometry.attributes.position.array;
             
-            // Dampen disturbance back to slow ambient drift
-            this.dustVelocities[i].x *= 0.95;
-            this.dustVelocities[i].y *= 0.95;
-            this.dustVelocities[i].z *= 0.95;
+            // Unproject mouse to 3D world space for interaction
+            const vector = new THREE.Vector3(this.mouseX, this.mouseY, 0.5);
+            vector.unproject(this.camera);
+            const dir = vector.sub(this.camera.position).normalize();
+            const distance = 14; // distance from camera to interaction plane
+            const mouse3D = this.camera.position.clone().add(dir.multiplyScalar(distance));
+
+            for (let i = 0; i < positions.length / 3; i++) {
+                // Apply velocities
+                positions[i * 3] += this.sandVelocities[i].x * delta;
+                positions[i * 3 + 1] += this.sandVelocities[i].y * delta;
+                positions[i * 3 + 2] += this.sandVelocities[i].z * delta;
+                
+                const px = positions[i * 3];
+                const py = positions[i * 3 + 1];
+                const pz = positions[i * 3 + 2];
+                
+                // Mouse repulsion
+                const dx = px - mouse3D.x;
+                const dy = py - mouse3D.y;
+                const distSq = dx*dx + dy*dy;
+                
+                if (distSq < 4.0) { // Interaction radius squared
+                    const force = (4.0 - distSq) * 1.5;
+                    this.sandVelocities[i].x += dx * force * delta;
+                    this.sandVelocities[i].y += dy * force * delta;
+                }
+                
+                // Friction / Air resistance for horizontal movement
+                this.sandVelocities[i].x *= 0.95;
+                this.sandVelocities[i].z *= 0.95;
+                
+                // If it falls below floor, slowly reset to top (continuous shower)
+                if (positions[i * 3 + 1] < 0) {
+                    if (this.sandFalling) {
+                        positions[i * 3 + 1] = 10 + Math.random() * 5; // Reset high
+                        this.sandVelocities[i].x = 0;
+                        this.sandVelocities[i].z = 0;
+                    }
+                }
+            }
+            this.sand.geometry.attributes.position.needsUpdate = true;
             
-            // Re-inject subtle drift
-            this.dustVelocities[i].x += (Math.random() - 0.5) * 0.001;
-            this.dustVelocities[i].y += (Math.random() - 0.5) * 0.001;
-            this.dustVelocities[i].z += (Math.random() - 0.5) * 0.001;
-        }
-        this.dust.geometry.attributes.position.needsUpdate = true;
-
-        if (!this.isRevealing) return;
-
-        this.elapsed += delta;
-        const progress = Math.min(this.elapsed / this.totalDuration, 1.0);
-        
-        // Easing function (easeInOutQuad)
-        const ease = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-
-        // 1. Fog dissipates slightly
-        this.scene.fog.density = 0.12 - (ease * 0.10); // Ends at 0.02
-
-        // 2. Spotlight sweeps and intensifies
-        this.spotlight.intensity = ease * 150; 
-        
-        // Light moves from side/low to top/center to perfectly align the shadow
-        this.spotlight.position.x = -8 + (ease * 8); // -8 to 0
-        this.spotlight.position.y = 2 + (ease * 6);  // 2 to 8
-        this.spotlight.position.z = 8 - (ease * 4);  // 8 to 4
-        
-        // 3. Camera drifts forward and slightly down
-        this.camera.position.z = 16 - (ease * 1); // 16 to 15
-        this.camera.position.y = 1.7 - (ease * 0.2); // 1.7 to 1.5
-        this.cameraController.currentZ = this.camera.position.z;
-        this.cameraController.targetZ = this.camera.position.z;
-        
-        // 4. Subtitle fades in late
-        if (progress > 0.7) {
-            this.subtitle.style.opacity = ((progress - 0.7) / 0.3).toString();
+            // Advance sequence
+            if (this.sandFalling) {
+                this.elapsedSand += delta;
+                if (this.elapsedSand > this.totalSandDuration) {
+                    this.startReveal();
+                }
+            }
         }
 
-        // 5. Completion
-        if (progress >= 1.0) {
-            this.completeSequence();
+        // Architectural Reveal
+        if (this.isRevealing) {
+            this.elapsedReveal += delta;
+            const progress = Math.min(this.elapsedReveal / this.totalRevealDuration, 1.0);
+            
+            const ease = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+            this.scene.fog.density = 0.15 - (ease * 0.13); // Ends at 0.02
+            
+            // Sand fades out
+            this.sand.material.opacity = 0.6 * (1.0 - ease);
+
+            this.spotlight.intensity = ease * 150; 
+            
+            this.spotlight.position.x = -8 + (ease * 8); 
+            this.spotlight.position.y = 2 + (ease * 6);  
+            this.spotlight.position.z = 8 - (ease * 4);  
+            
+            this.camera.position.z = 16 - (ease * 1); 
+            this.camera.position.y = 1.7 - (ease * 0.2); 
+            this.cameraController.currentZ = this.camera.position.z;
+            this.cameraController.targetZ = this.camera.position.z;
+            
+            if (progress > 0.7) {
+                this.subtitle.style.opacity = ((progress - 0.7) / 0.3).toString();
+            }
+
+            if (progress >= 1.0) {
+                this.completeSequence();
+            }
         }
     }
 }
