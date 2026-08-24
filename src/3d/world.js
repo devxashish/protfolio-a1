@@ -151,6 +151,21 @@ export class World {
             alcoveWall.position.set(-21, 3.5, zPos + 6);
             alcoveWall.receiveShadow = true;
             this.scene.add(alcoveWall);
+
+            // Add subtle holographic signage at the entrance
+            let labelText = "ARCHIVE";
+            if (zPos === -12) labelText = "PRJ_01: MOBILE_SEC";
+            if (zPos === -24) labelText = "PRJ_02: UNZIP_WEB";
+            if (zPos === -36) labelText = "PRJ_03: ATLAS_UI";
+
+            const signTex = BlueprintGenerator.createHolographicSign(labelText);
+            const signMat = new THREE.MeshBasicMaterial({ 
+                map: signTex, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false 
+            });
+            const signMesh = new THREE.Mesh(new THREE.PlaneGeometry(3, 0.5), signMat);
+            signMesh.position.set(-9, 5, zPos + 2); // Hovering at the entrance
+            signMesh.rotation.y = Math.PI / 4; // Angled to be visible from the spine
+            this.scene.add(signMesh);
         }
 
         if (!isStoryBranch) {
