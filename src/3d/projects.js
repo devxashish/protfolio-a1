@@ -25,7 +25,7 @@ export class Projects {
         id: 'ms-security', 
         name: 'MS Security', 
         url: 'https://drive.google.com/file/d/1tf8zqLWN0mHaaUF2fFbYuzI1CDOv3uSf/view?usp=drive_link', 
-        z: -12, 
+        x: -2, z: 0, 
         type: 'phone', 
         color: 0x2244aa,
         info: {
@@ -39,7 +39,7 @@ export class Projects {
         id: 'get-unzip', 
         name: 'GET UNZIP', 
         url: 'https://unzip-web.netlify.app', 
-        z: -24, 
+        x: 0, z: -2, 
         type: 'monitor', 
         color: 0xaa4422,
         info: {
@@ -53,7 +53,7 @@ export class Projects {
         id: 'atlas-ui', 
         name: 'Atlas UI', 
         url: 'https://atlas-ui-three.vercel.app', 
-        z: -36, 
+        x: 2, z: 0, 
         type: 'stack', 
         color: 0x22aa44,
         info: {

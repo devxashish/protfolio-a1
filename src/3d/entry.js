@@ -10,7 +10,7 @@ export class EntrySequence {
         
         this.isActive = true;
         this.isRevealing = false;
-        this.sandFalling = false;
+        this.sandFalling = true;
         
         this.elapsedReveal = 0;
         this.totalRevealDuration = 3.0; // architectural reveal time
@@ -81,79 +81,12 @@ export class EntrySequence {
     }
 
     setupUI() {
-        this.overlay = document.createElement('div');
-        this.overlay.style.position = 'fixed';
-        this.overlay.style.top = '0';
-        this.overlay.style.left = '0';
-        this.overlay.style.width = '100%';
-        this.overlay.style.height = '100%';
-        this.overlay.style.zIndex = '9999';
-        this.overlay.style.cursor = 'pointer';
-        this.overlay.style.display = 'flex';
-        this.overlay.style.alignItems = 'center';
-        this.overlay.style.justifyContent = 'center';
-        document.body.appendChild(this.overlay);
-
-        const tapPrompt = document.createElement('div');
-        tapPrompt.textContent = "TAP OR SCROLL TO INITIATE";
-        tapPrompt.style.color = 'rgba(255,255,255,0.4)';
-        tapPrompt.style.fontFamily = 'monospace';
-        tapPrompt.style.letterSpacing = '4px';
-        tapPrompt.style.fontSize = '12px';
-        tapPrompt.style.animation = 'pulse 2s infinite';
-        this.overlay.appendChild(tapPrompt);
         
-        if (!document.getElementById('pulse-anim')) {
-            const style = document.createElement('style');
-            style.id = 'pulse-anim';
-            style.innerHTML = `
-                @keyframes pulse {
-                    0% { opacity: 0.2; }
-                    50% { opacity: 0.8; }
-                    100% { opacity: 0.2; }
-                }
-            `;
-            document.head.appendChild(style);
-        }
+        // No overlay, sand starts automatically
+        this.overlay = null;
 
-        this.subtitle = document.createElement('div');
-        this.subtitle.textContent = "SOFTWARE ENGINEER";
-        this.subtitle.style.position = 'fixed';
-        this.subtitle.style.top = '60%';
-        this.subtitle.style.width = '100%';
-        this.subtitle.style.textAlign = 'center';
-        this.subtitle.style.color = '#fff';
-        this.subtitle.style.fontFamily = 'monospace';
-        this.subtitle.style.letterSpacing = '5px';
-        this.subtitle.style.fontSize = '12px';
-        this.subtitle.style.opacity = '0';
-        this.subtitle.style.transition = 'opacity 2s ease';
-        this.subtitle.style.zIndex = '10';
-        this.subtitle.style.pointerEvents = 'none';
-        document.body.appendChild(this.subtitle);
 
-        this.skipBtn = document.createElement('div');
-        this.skipBtn.textContent = "SKIP";
-        this.skipBtn.style.position = 'fixed';
-        this.skipBtn.style.bottom = '20px';
-        this.skipBtn.style.right = '20px';
-        this.skipBtn.style.color = 'rgba(255,255,255,0.3)';
-        this.skipBtn.style.fontFamily = 'monospace';
-        this.skipBtn.style.fontSize = '10px';
-        this.skipBtn.style.letterSpacing = '2px';
-        this.skipBtn.style.cursor = 'pointer';
-        this.skipBtn.style.zIndex = '10000';
-        this.skipBtn.style.transition = 'color 0.3s';
-        this.skipBtn.onmouseover = () => this.skipBtn.style.color = 'rgba(255,255,255,0.8)';
-        this.skipBtn.onmouseout = () => this.skipBtn.style.color = 'rgba(255,255,255,0.3)';
-        document.body.appendChild(this.skipBtn);
-
-        const trigger = (e) => {
-            if (!this.sandFalling && !this.isRevealing) {
-                if (e.target === this.skipBtn) return;
-                this.startSand();
-            }
-        };
+        
 
         const updateMouse = (e) => {
             // Normalized device coordinates (-1 to +1)
@@ -166,21 +99,13 @@ export class EntrySequence {
         document.addEventListener('mousemove', updateMouse);
         document.addEventListener('touchmove', updateMouse, {passive: true});
 
-        this.overlay.addEventListener('click', trigger);
-        this.overlay.addEventListener('touchstart', trigger);
-        this.overlay.addEventListener('wheel', trigger);
         
-        this.skipBtn.addEventListener('click', () => {
-            this.skip();
-        });
     }
 
     lockControls() {
         this.cameraController.enabled = false;
-        this.cameraController.currentZ = 16;
-        this.cameraController.targetZ = 16;
-        this.camera.position.z = 16;
-        this.camera.position.y = 1.7;
+        this.cameraController.orbitRadius = 40;
+        this.cameraController.targetRadius = 40;
     }
 
     startSand() {
@@ -216,10 +141,7 @@ export class EntrySequence {
         this.spotlight.intensity = 150;
         this.spotlight.position.set(0, 8, 4); 
         
-        this.camera.position.z = 15;
-        this.camera.position.y = 1.5;
-        this.cameraController.currentZ = 15;
-        this.cameraController.targetZ = 15;
+        this.cameraController.targetRadius = 30;
         this.cameraController.enabled = true;
         
         this.lighting.ambientLight.intensity = this.origAmbient;
@@ -304,10 +226,7 @@ export class EntrySequence {
             this.spotlight.position.y = 2 + (ease * 6);  
             this.spotlight.position.z = 8 - (ease * 4);  
             
-            this.camera.position.z = 16 - (ease * 1); 
-            this.camera.position.y = 1.7 - (ease * 0.2); 
-            this.cameraController.currentZ = this.camera.position.z;
-            this.cameraController.targetZ = this.camera.position.z;
+            // Camera handled by CameraController
             
             if (progress > 0.7) {
                 this.subtitle.style.opacity = ((progress - 0.7) / 0.3).toString();

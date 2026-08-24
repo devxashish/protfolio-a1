@@ -103,9 +103,8 @@ export class App {
     if (!this.prefersReducedMotion) {
         if (this.entry && this.entry.isActive) {
             this.entry.update(delta);
-        } else {
-            this.cameraController.update(delta);
         }
+        this.cameraController.update(delta);
         
         this.weather.update(delta, time);
         this.projects.update(delta, this.cameraController.camera);
