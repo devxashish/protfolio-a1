@@ -98,6 +98,7 @@ export class EntrySequence {
 
         document.addEventListener('mousemove', updateMouse);
         document.addEventListener('touchmove', updateMouse, {passive: true});
+        document.addEventListener('touchstart', updateMouse, {passive: true});
 
         
     }

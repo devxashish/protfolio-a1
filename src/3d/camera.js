@@ -50,8 +50,8 @@ export class CameraController {
       const deltaY = currentTouch.y - this.previousTouch.y;
       
       this.targetAngle -= deltaX * 0.01;
-      this.targetY += deltaY * 0.05;
-      this.clampY();
+      this.targetRadius += deltaY * 0.1; // Mobile: Vertical drag zooms in/out
+      this.clampRadius();
       
       this.previousTouch = currentTouch;
     }, { passive: true });
