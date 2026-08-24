@@ -67,7 +67,7 @@ export class Projects {
 
     projectData.forEach((p, i) => {
         const artifact = this.createArtifact(p);
-        artifact.position.set(-16, 1.5, p.z + 6);
+        artifact.position.set(p.x, 1.5, p.z);
         artifact.rotation.y = Math.PI / 2;
         artifact.userData = { ...p, originalY: 1.5, isProject: true };
         this.scene.add(artifact);

@@ -95,6 +95,25 @@ export class CameraController {
     this.targetY = Math.max(1.0, Math.min(15, this.targetY));
   }
 
+
+  focusOn(position, rotation) {
+    this.autoRotate = false;
+    this.isFocused = true;
+    this.preFocusTargetRadius = this.targetRadius;
+    this.preFocusTargetY = this.targetY;
+    
+    // Convert target x,z back to radius/angle
+    this.targetRadius = Math.sqrt(position.x*position.x + position.z*position.z);
+    this.targetAngle = Math.atan2(position.z, position.x);
+    this.targetY = position.y;
+  }
+
+  exitFocus() {
+    this.isFocused = false;
+    this.targetRadius = this.preFocusTargetRadius || 30;
+    this.targetY = this.preFocusTargetY || 3.5;
+  }
+
   resize() {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
@@ -116,7 +135,9 @@ export class CameraController {
     
     this.camera.position.set(targetX, this.orbitY, targetZ);
     
-    // Look at house center
-    this.camera.lookAt(0, 3, 0);
+    // Look through the center to prevent gimbal lock when inside the house
+    const lookX = Math.cos(this.orbitAngle + Math.PI);
+    const lookZ = Math.sin(this.orbitAngle + Math.PI);
+    this.camera.lookAt(lookX, 3, lookZ);
   }
 }
