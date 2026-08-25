@@ -7,39 +7,42 @@ export class CameraController {
     
     this.enabled = true;
     
-    // Orbit Mechanics
-    this.orbitRadius = 30; // Start outside
-    this.targetRadius = 30;
+    // Core parameters mapped to scroll
+    this.orbitRadius = 40; 
+    this.targetRadius = 40;
     this.orbitAngle = Math.PI / 4; 
-    this.targetAngle = Math.PI / 4;
+    
+    this.baseAngle = Math.PI / 4; 
+    this.angleOffset = 0;
+    this.targetAngleOffset = 0;
+    
     this.orbitY = 3.5;
     this.targetY = 3.5;
     
-    this.autoRotate = true;
-    
-    // For smooth lerping
-    this.currentX = 0;
-    this.currentY = this.orbitY;
-    this.currentZ = this.orbitRadius;
-    
     this.isDragging = false;
     this.previousTouch = { x: 0, y: 0 };
+    
+    // Smooth scroll interpolation
+    this.scrollProgress = 0;
+    this.targetScrollProgress = 0;
     
     this.bindEvents();
   }
 
   bindEvents() {
-    window.addEventListener('wheel', (e) => {
-      if (!this.enabled) return;
-      // Scroll to zoom in/out (go inside house)
-      this.targetRadius += e.deltaY * 0.05;
-      this.clampRadius();
+    // 1. Map native window scroll to camera progression
+    window.addEventListener('scroll', () => {
+        if (!this.enabled) return;
+        const maxScroll = document.body.scrollHeight - window.innerHeight;
+        if (maxScroll > 0) {
+            this.targetScrollProgress = window.scrollY / maxScroll; // 0.0 to 1.0
+        }
     }, { passive: true });
 
+    // 2. Allow horizontal dragging to orbit the camera (Offset)
     document.addEventListener('touchstart', (e) => {
       if (!this.enabled) return;
       this.isDragging = true;
-      this.autoRotate = false; // Stop auto-rotate when user interacts
       this.previousTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     }, { passive: true });
 
@@ -47,12 +50,8 @@ export class CameraController {
       if (!this.enabled || !this.isDragging) return;
       const currentTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
       const deltaX = currentTouch.x - this.previousTouch.x;
-      const deltaY = currentTouch.y - this.previousTouch.y;
       
-      this.targetAngle -= deltaX * 0.01;
-      this.targetRadius += deltaY * 0.1; // Mobile: Vertical drag zooms in/out
-      this.clampRadius();
-      
+      this.targetAngleOffset -= deltaX * 0.005; // Drag to look around
       this.previousTouch = currentTouch;
     }, { passive: true });
 
@@ -61,11 +60,9 @@ export class CameraController {
       this.isDragging = false;
     });
 
-    // Desktop Mouse Drag
     document.addEventListener('mousedown', (e) => {
       if (!this.enabled) return;
       this.isDragging = true;
-      this.autoRotate = false;
       this.previousTouch = { x: e.clientX, y: e.clientY };
     });
 
@@ -73,12 +70,8 @@ export class CameraController {
       if (!this.enabled || !this.isDragging) return;
       const currentTouch = { x: e.clientX, y: e.clientY };
       const deltaX = currentTouch.x - this.previousTouch.x;
-      const deltaY = currentTouch.y - this.previousTouch.y;
       
-      this.targetAngle -= deltaX * 0.01;
-      this.targetY += deltaY * 0.05;
-      this.clampY();
-      
+      this.targetAngleOffset -= deltaX * 0.005;
       this.previousTouch = currentTouch;
     });
     
@@ -87,24 +80,17 @@ export class CameraController {
     });
   }
 
-  clampRadius() {
-    this.targetRadius = Math.max(0.1, Math.min(40, this.targetRadius));
+  resize() {
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
   }
-  
-  clampY() {
-    this.targetY = Math.max(1.0, Math.min(15, this.targetY));
-  }
-
 
   focusOn(position, rotation) {
-    this.autoRotate = false;
     this.isFocused = true;
     this.preFocusTargetRadius = this.targetRadius;
     this.preFocusTargetY = this.targetY;
     
-    // Convert target x,z back to radius/angle
     this.targetRadius = Math.sqrt(position.x*position.x + position.z*position.z);
-    this.targetAngle = Math.atan2(position.z, position.x);
     this.targetY = position.y;
   }
 
@@ -114,20 +100,28 @@ export class CameraController {
     this.targetY = this.preFocusTargetY || 3.5;
   }
 
-  resize() {
-    this.camera.aspect = window.innerWidth / window.innerHeight;
-    this.camera.updateProjectionMatrix();
-  }
-
   update(delta) {
-    if (this.autoRotate) {
-        this.targetAngle += 0.2 * delta; // slow cinematic orbit
+    // Smoothly interpolate scroll
+    this.scrollProgress += (this.targetScrollProgress - this.scrollProgress) * 5.0 * delta;
+
+    if (!this.isFocused) {
+        // Map scroll to radius (35 outside -> 2 inside)
+        this.targetRadius = 35 - (this.scrollProgress * 33);
+        
+        // Map scroll to base angle (auto-orbit as you scroll in)
+        // 1 full rotation = Math.PI * 2
+        this.baseAngle = (Math.PI / 4) + (this.scrollProgress * Math.PI * 1.5);
+        
+        // Map scroll to Y height (start high, drop low inside)
+        this.targetY = 6.0 - (this.scrollProgress * 4.0); // 6.0 to 2.0
     }
 
     // Spring physics to targets
     this.orbitRadius += (this.targetRadius - this.orbitRadius) * 5.0 * delta;
-    this.orbitAngle += (this.targetAngle - this.orbitAngle) * 5.0 * delta;
+    this.angleOffset += (this.targetAngleOffset - this.angleOffset) * 5.0 * delta;
     this.orbitY += (this.targetY - this.orbitY) * 5.0 * delta;
+
+    this.orbitAngle = this.baseAngle + this.angleOffset;
 
     // Convert polar to cartesian
     const targetX = Math.cos(this.orbitAngle) * this.orbitRadius;
@@ -138,6 +132,10 @@ export class CameraController {
     // Look through the center to prevent gimbal lock when inside the house
     const lookX = Math.cos(this.orbitAngle + Math.PI);
     const lookZ = Math.sin(this.orbitAngle + Math.PI);
-    this.camera.lookAt(lookX, 3, lookZ);
+    
+    // When far away, look slightly higher. When inside, look at project level
+    const lookY = 3.0 - (this.scrollProgress * 1.5); 
+    
+    this.camera.lookAt(lookX, lookY, lookZ);
   }
 }
