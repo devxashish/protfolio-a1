@@ -110,9 +110,10 @@ export class App {
         this.projects.update(delta, this.cameraController.camera);
         
         if (this.audio && this.audio.enabled) {
-            const camVel = Math.abs(this.cameraController.targetZ - this.cameraController.currentZ);
+            // Footstep velocity mapped to orbit/scroll changes instead of Z
+            const camVel = Math.abs((this.cameraController.targetRadius || 0) - (this.cameraController.orbitRadius || 0));
             this.audio.updateFootsteps(delta, camVel);
-            this.audio.update(delta, this.cameraController.currentZ, this.cameraController.isTransitioning);
+            this.audio.update(delta, this.cameraController.orbitRadius, this.cameraController.isFocused);
         }
     }
     

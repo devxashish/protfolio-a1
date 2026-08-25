@@ -32,11 +32,11 @@ export class EntrySequence {
         
         this.origAmbient = this.lighting.ambientLight.intensity;
         this.origDir = this.lighting.directionalLight.intensity;
-        this.origExt = this.lighting.exteriorLight.intensity;
+        this.origExt = this.lighting.exteriorLight ? this.lighting.exteriorLight.intensity : 0;
         
         this.lighting.ambientLight.intensity = 0.01;
         this.lighting.directionalLight.intensity = 0;
-        this.lighting.exteriorLight.intensity = 0;
+        if (this.lighting.exteriorLight) this.lighting.exteriorLight.intensity = 0;
         
         this.spotlight = new THREE.SpotLight(0xffffff, 0, 100, Math.PI / 6, 0.5, 1.0);
         this.spotlight.position.set(-10, 2, 8); 
@@ -162,7 +162,7 @@ export class EntrySequence {
         
         this.lighting.ambientLight.intensity = this.origAmbient;
         this.lighting.directionalLight.intensity = this.origDir;
-        this.lighting.exteriorLight.intensity = this.origExt;
+        if (this.lighting.exteriorLight) this.lighting.exteriorLight.intensity = this.origExt;
     }
 
     update(delta) {
