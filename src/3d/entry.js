@@ -1,4 +1,4 @@
-import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+import * as THREE from 'three';
 
 export class EntrySequence {
     constructor(app) {
@@ -116,7 +116,7 @@ export class EntrySequence {
 
     startSand() {
         this.sandFalling = true;
-        this.overlay.style.display = 'none';
+        
         
         if (this.app.audio && this.app.audio.enabled) {
             // Audio integration
@@ -138,10 +138,10 @@ export class EntrySequence {
         this.isRevealing = false;
         this.sandFalling = false;
         
-        if (this.overlay && this.overlay.parentNode) this.overlay.remove();
-        if (this.skipBtn && this.skipBtn.parentNode) this.skipBtn.remove();
+        
+        
         if (this.sand) this.scene.remove(this.sand); // Remove sand to save memory
-        this.subtitle.style.opacity = '1';
+        
         
         this.scene.fog.density = 0.02;
         this.spotlight.intensity = 150;
@@ -244,9 +244,7 @@ export class EntrySequence {
             
             // Camera handled by CameraController
             
-            if (progress > 0.7) {
-                this.subtitle.style.opacity = ((progress - 0.7) / 0.3).toString();
-            }
+            
 
             if (progress >= 1.0) {
                 this.completeSequence();

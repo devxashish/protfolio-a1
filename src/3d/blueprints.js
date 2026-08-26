@@ -1,4 +1,4 @@
-import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+import * as THREE from 'three';
 
 export class BlueprintGenerator {
     static createStoryBlueprint() {
@@ -16,29 +16,7 @@ export class BlueprintGenerator {
         ctx.lineWidth = 2;
         for (let i = 0; i < canvas.width; i += 64) {
             ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
-            static createHolographicSign(text) {
-        const canvas = document.createElement('canvas');
-        canvas.width = 512;
-        canvas.height = 128;
-        const ctx = canvas.getContext('2d');
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        ctx.fillStyle = '#88ccff';
-        ctx.font = 'bold 36px monospace';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(text, 256, 64);
-        
-        ctx.strokeStyle = 'rgba(136, 204, 255, 0.3)';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(10, 10, 492, 108);
-
-        const texture = new THREE.CanvasTexture(canvas);
-        texture.anisotropy = 4;
-        return texture;
-    }
-}
+        }
         for (let i = 0; i < canvas.height; i += 64) {
             ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
         }
@@ -136,17 +114,35 @@ export class BlueprintGenerator {
         texture.anisotropy = 4;
         return texture;
     }
-}
+
+    static createHolographicSign(text) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 128;
+        const ctx = canvas.getContext('2d');
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = '#88ccff';
+        ctx.font = 'bold 36px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, 256, 64);
+        
+        ctx.strokeStyle = 'rgba(136, 204, 255, 0.3)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(10, 10, 492, 108);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.anisotropy = 4;
+        return texture;
+    }
 
     static createIdentityAlphaMap() {
         const canvas = document.createElement('canvas');
         canvas.width = 2048;
         canvas.height = 512;
         const ctx = canvas.getContext('2d');
-
-        // Black background (transparent to light in alpha map if inverted, wait:
-        // For alphaMap: white is opaque (blocks light), black is transparent (lets light through).
-        // If we want the SHADOW to spell ASHISH, the text must be WHITE (opaque) and the background BLACK (transparent).
         
         ctx.fillStyle = '#000000'; // Transparent to light
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -162,3 +158,4 @@ export class BlueprintGenerator {
         texture.anisotropy = 4;
         return texture;
     }
+}

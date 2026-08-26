@@ -1,4 +1,4 @@
-import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+import * as THREE from 'three';
 import { World } from './world.js';
 import { CameraController } from './camera.js';
 import { Lighting } from './lighting.js';
